@@ -23,7 +23,7 @@ public class NexadomusApiClient {
     private static final String TAG = "NexadomusApiClient";
     private static final String ESP_IP_ADDRESS = "192.168.4.1"; // Default AP IP
     private static final String BASE_URL = "http://" + ESP_IP_ADDRESS;
-    private static final String NEXADOMUS_SSID = "Nexadomus Prototype";
+    private static final String NEXADOMUS_SSID = "Nexadomus Home";
     
     private static NexadomusApiClient instance;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -273,7 +273,7 @@ public class NexadomusApiClient {
     }
     
     // Check if connected to Nexadomus hotspot
-    private boolean isConnectedToNexadomus() {
+    public boolean isConnectedToNexadomus() {
         if (appContext == null) {
             return false;
         }
@@ -296,6 +296,28 @@ public class NexadomusApiClient {
         }
         
         return false;
+    }
+
+    // New method to get available devices from ESP32
+    public void getAvailableDevices(ApiCallback callback) {
+        if (isConnectedToNexadomus()) {
+            String endpoint = BASE_URL + "/devices";
+            executeRequest(endpoint, new ApiCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    // In a real implementation, parse the response
+                    // For now, just pass it through
+                    callback.onSuccess(response);
+                }
+                
+                @Override
+                public void onError(String error) {
+                    callback.onError(error);
+                }
+            });
+        } else {
+            mainHandler.post(() -> callback.onError("Not connected to Nexadomus network"));
+        }
     }
 
     // Execute HTTP request in background thread

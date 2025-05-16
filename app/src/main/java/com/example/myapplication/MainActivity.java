@@ -16,7 +16,7 @@ import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    private static final String NEXADOMUS_SSID = "Nexadomus Prototype";
+    private static final String NEXADOMUS_SSID = "Nexadomus Home";
     private NavController navController;
 
     @Override
