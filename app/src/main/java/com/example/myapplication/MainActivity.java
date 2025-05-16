@@ -10,8 +10,10 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        // Set up the toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        
         // Initialize API clients with application context
         NexadomusApiClient.getInstance().setAppContext(getApplicationContext());
         ThingSpeakClient.getInstance().setAppContext(getApplicationContext());
@@ -34,6 +40,13 @@ public class MainActivity extends AppCompatActivity {
         
         if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
+            
+            // Set up the AppBarConfiguration to connect NavController with Toolbar
+            AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                    R.id.dashboardFragment, R.id.addDeviceFragment)
+                    .build();
+            NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+            
             // Connect the BottomNavigationView with the NavController
             BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
             NavigationUI.setupWithNavController(bottomNav, navController);
