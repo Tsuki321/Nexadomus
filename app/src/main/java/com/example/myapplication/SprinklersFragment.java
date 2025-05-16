@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -69,6 +72,12 @@ public class SprinklersFragment extends Fragment {
     // Number pickers for the manual duration selection
     private NumberPicker minutesPicker;
     private NumberPicker secondsPicker;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true); // Enable options menu
+    }
 
     @Nullable
     @Override
@@ -1117,5 +1126,20 @@ public class SprinklersFragment extends Fragment {
         } else {
             return String.format("%d:%02d", minutes, seconds);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_common, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_help) {
+            HelpDialogUtil.showConnectionHelpDialog(requireContext());
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 } 

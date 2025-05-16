@@ -74,28 +74,19 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_add_device, menu);
+        inflater.inflate(R.menu.menu_common, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_help) {
-            showConnectionHelpDialog();
+            HelpDialogUtil.showConnectionHelpDialog(requireContext());
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
     
-    private void showConnectionHelpDialog() {
-        new AlertDialog.Builder(requireContext())
-            .setTitle("How to Connect")
-            .setMessage("When WiFi connection is down, connect your phone to the \"Nexadomus Home\" WiFi network with the password \"smartHome1234\"")
-            .setPositiveButton("OK", null)
-            .create()
-            .show();
-    }
-
     private void discoverDevices() {
         // Clear previous results
         devices.clear();

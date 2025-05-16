@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,6 +26,12 @@ public class ACFragment extends Fragment {
     private boolean isACOn = false;
     private SharedPreferences sharedPreferences;
     private NexadomusApiClient apiClient;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true); // Enable options menu
+    }
 
     @Nullable
     @Override
@@ -95,5 +104,20 @@ public class ACFragment extends Fragment {
                 connectionModeText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
             }
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_common, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_help) {
+            HelpDialogUtil.showConnectionHelpDialog(requireContext());
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 } 
