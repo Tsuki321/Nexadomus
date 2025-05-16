@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Nexadomus</string>
+    <string name="app_logo">App Logo</string>
+    <string name="permission_explanation">Nexadomus needs WiFi and location permissions to discover and connect to your smart home devices. This allows the app to scan for available WiFi networks.</string>
+    <string name="permission_explanation_denied">Some permissions were denied. WiFi and location access are needed for device discovery. The app may not work correctly without these permissions. Please grant the permissions in Settings.</string>
+    <string name="grant_permissions">Grant Permissions</string>
+    <string name="permission_rationale">WiFi scanning requires location permissions on Android 12 and below, or nearby devices permissions on Android 13+. These permissions are necessary to discover your Nexadomus device.</string>
+</resources>

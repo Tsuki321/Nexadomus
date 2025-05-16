@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/lightsFragment">
+
+    <fragment
+        android:id="@+id/lightsFragment"
+        android:name="com.example.myapplication.LightsFragment"
+        android:label="Lights"
+        tools:layout="@layout/fragment_lights" />
+
+    <fragment
+        android:id="@+id/acFragment"
+        android:name="com.example.myapplication.ACFragment"
+        android:label="A/C"
+        tools:layout="@layout/fragment_ac" />
+
+    <fragment
+        android:id="@+id/garageFragment"
+        android:name="com.example.myapplication.GarageFragment"
+        android:label="Garage Door"
+        tools:layout="@layout/fragment_garage" />
+
+    <fragment
+        android:id="@+id/sprinklersFragment"
+        android:name="com.example.myapplication.SprinklersFragment"
+        android:label="Sprinklers"
+        tools:layout="@layout/fragment_sprinklers" />
+
+    <fragment
+        android:id="@+id/addDeviceFragment"
+        android:name="com.example.myapplication.AddDeviceFragment"
+        android:label="Add Device" />
+
+</navigation> 
