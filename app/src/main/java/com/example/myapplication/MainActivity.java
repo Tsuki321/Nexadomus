@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
             
             // Set up the AppBarConfiguration to connect NavController with Toolbar
             AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                    R.id.dashboardFragment, R.id.addDeviceFragment)
+                    R.id.lightsFragment, R.id.acFragment, R.id.garageFragment, 
+                    R.id.sprinklersFragment, R.id.addDeviceFragment)
                     .build();
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
             
