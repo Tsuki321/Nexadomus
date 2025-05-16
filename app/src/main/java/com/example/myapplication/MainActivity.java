@@ -10,11 +10,14 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String NEXADOMUS_SSID = "Nexadomus Prototype";
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,35 +28,16 @@ public class MainActivity extends AppCompatActivity {
         NexadomusApiClient.getInstance().setAppContext(getApplicationContext());
         ThingSpeakClient.getInstance().setAppContext(getApplicationContext());
         
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        bottomNav.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
-            
-            if (item.getItemId() == R.id.garageFragment) {
-                selectedFragment = new GarageFragment();
-            } else if (item.getItemId() == R.id.sprinklersFragment) {
-                selectedFragment = new SprinklersFragment();
-            } else if (item.getItemId() == R.id.lightsFragment) {
-                selectedFragment = new LightsFragment();
-            } else if (item.getItemId() == R.id.acFragment) {
-                selectedFragment = new ACFragment();
-            } else if (item.getItemId() == R.id.addDeviceFragment) {
-                selectedFragment = new AddDeviceFragment();
-            }
-            
-            if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment, selectedFragment)
-                    .commit();
-                return true;
-            }
-            return false;
-        });
+        // Get the NavHostFragment and NavController
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment);
         
-        // Set default fragment
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.nav_host_fragment, new GarageFragment())
-            .commit();
+        if (navHostFragment != null) {
+            navController = navHostFragment.getNavController();
+            // Connect the BottomNavigationView with the NavController
+            BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+            NavigationUI.setupWithNavController(bottomNav, navController);
+        }
         
         // Check WiFi connection status
         checkWiFiConnection();
