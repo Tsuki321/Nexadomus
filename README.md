@@ -1,19 +1,24 @@
-# MyApplication
+# Nexadomus
 
-An Android application project.
+Smart home automation application for Android that connects to various IoT devices. This application is part of the Nexadomus smart home ecosystem.
+
+## Features
+
+- Control smart home devices
+- Android application with modern UI
+- Built with Android SDK
+- GitHub Actions CI/CD pipeline for automated builds
 
 ## Build Status
 
-![Android CI](https://github.com/[your-username]/MyApplication/workflows/Android%20CI/badge.svg)
+![Android CI](https://github.com/yourusername/Nexadomus/workflows/Android%20CI/badge.svg)
 
 ## Getting Started
 
-1. Clone this repository
+1. Clone the repository
 2. Open the project in Android Studio
 3. Build and run the application
 
-## Requirements
+## License
 
-- Android Studio Arctic Fox or newer
-- Android SDK 24+
-- Gradle 8.0+ 
+This project is licensed under the MIT License - see the LICENSE file for details. 
