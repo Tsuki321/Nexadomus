@@ -11,7 +11,7 @@ Smart home automation application for Android that connects to various IoT devic
 
 ## Build Status
 
-![Android CI](https://github.com/yourusername/Nexadomus/workflows/Android%20CI/badge.svg)
+![Android CI](https://github.com/Tsuki321/Nexadomus/actions/workflows/android.yml/badge.svg)
 
 ## Getting Started
 
