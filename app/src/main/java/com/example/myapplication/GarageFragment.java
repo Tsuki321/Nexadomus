@@ -19,6 +19,7 @@ import org.json.JSONObject;
 public class GarageFragment extends Fragment {
     private static final String PREFS_NAME = "NexadomusGarage";
     private static final String PREF_GARAGE_STATE = "garageState";
+    private static final String PREF_REMOTE_MODE = "remoteMode";
     
     private boolean isGarageOpen = false;
     private TextView statusText;
@@ -112,7 +113,15 @@ public class GarageFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Refresh status when fragment becomes visible
+        
+        // First check if we were previously in remote mode
+        boolean wasInRemoteMode = sharedPreferences.getBoolean(PREF_REMOTE_MODE, false);
+        if (wasInRemoteMode) {
+            showRemoteMode(true);
+        }
+        
+        // Still try to refresh status when fragment becomes visible
+        // If we're in remote mode, this will just reconfirm that status
         fetchCurrentStatus();
     }
     
@@ -164,6 +173,9 @@ public class GarageFragment extends Fragment {
     }
     
     private void showRemoteMode(boolean isRemote) {
+        // Save the mode to preferences for persistence
+        sharedPreferences.edit().putBoolean(PREF_REMOTE_MODE, isRemote).apply();
+        
         if (connectionModeText != null) {
             if (isRemote) {
                 connectionModeText.setText("Mode: REMOTE (ThingSpeak)");

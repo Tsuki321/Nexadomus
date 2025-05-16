@@ -40,6 +40,7 @@ public class SprinklersFragment extends Fragment {
     private static final String PREF_START_TIME_SECOND = "startTimeSecond";
     private static final String PREF_MANUAL_DURATION_MINUTES = "manualDurationMinutes";
     private static final String PREF_MANUAL_DURATION_SECONDS = "manualDurationSeconds";
+    private static final String PREF_REMOTE_MODE = "remoteMode";
     
     private boolean isSprinklerOn = false;
     private List<CheckBox> dayCheckboxes = new ArrayList<>();
@@ -194,6 +195,10 @@ public class SprinklersFragment extends Fragment {
                             Toast.makeText(getContext(), "Remote command sent: Sprinklers on indefinitely", 
                                     Toast.LENGTH_SHORT).show();
                         }
+                        
+                        // Update UI to reflect that sprinklers should be on
+                        isSprinklerOn = true;
+                        
                     } else {
                         // Update local state
                         isSprinklerOn = true;
@@ -219,6 +224,7 @@ public class SprinklersFragment extends Fragment {
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                Toast.makeText(getContext(), "Command sent, but timer parsing failed", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             // No timer was set, show indefinite message
@@ -329,6 +335,13 @@ public class SprinklersFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        
+        // First check if we were previously in remote mode
+        boolean wasInRemoteMode = sharedPreferences.getBoolean(PREF_REMOTE_MODE, false);
+        if (wasInRemoteMode) {
+            showRemoteMode(true);
+        }
+        
         // Check if there's a saved timer that needs to be displayed
         if (sharedPreferences.getBoolean(PREF_TIMER_ACTIVE, false)) {
             long endTimeMillis = sharedPreferences.getLong(PREF_TIMER_END_TIME, 0);
@@ -348,7 +361,8 @@ public class SprinklersFragment extends Fragment {
             }
         }
         
-        // Refresh status when fragment becomes visible
+        // Still try to refresh status when fragment becomes visible
+        // If we're in remote mode, this will just reconfirm that status
         fetchCurrentStatus();
     }
     
@@ -546,11 +560,15 @@ public class SprinklersFragment extends Fragment {
 
                                     @Override
                                     public void onError(String error) {
-                                        showError("Failed to turn off sprinklers: " + error);
-                                        // Still update UI even if command fails
-                                        isSprinklerOn = false;
-                                        durationLayout.setVisibility(View.GONE);
-                                        timerText.setVisibility(View.GONE);
+                                        // Check if we're in remote mode
+                                        if (error.contains("Failed to connect")) {
+                                            // We're in remote mode, send the off command directly
+                                            Toast.makeText(getContext(), "Remote mode detected, sending stop command", Toast.LENGTH_SHORT).show();
+                                            showRemoteMode(true);
+                                        }
+                                        
+                                        // In any case, still turn off as a precaution
+                                        sendSprinklersOffCommand();
                                     }
                                 });
                             } else {
@@ -569,7 +587,14 @@ public class SprinklersFragment extends Fragment {
 
                     @Override
                     public void onError(String error) {
-                        // In case of error, still turn off as a precaution
+                        // Check if we're in remote mode
+                        if (error.contains("Failed to connect")) {
+                            // We're in remote mode, send the off command directly
+                            Toast.makeText(getContext(), "Remote mode detected, sending stop command", Toast.LENGTH_SHORT).show();
+                            showRemoteMode(true);
+                        }
+                        
+                        // In any case, still turn off as a precaution
                         sendSprinklersOffCommand();
                     }
                 });
@@ -1030,6 +1055,9 @@ public class SprinklersFragment extends Fragment {
     }
     
     private void showRemoteMode(boolean isRemote) {
+        // Save the mode to preferences for persistence
+        sharedPreferences.edit().putBoolean(PREF_REMOTE_MODE, isRemote).apply();
+        
         if (connectionModeText != null) {
             if (isRemote) {
                 connectionModeText.setText("Mode: REMOTE (ThingSpeak)");

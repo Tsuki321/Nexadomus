@@ -64,51 +64,23 @@ public class ThingSpeakClient {
     // Send command to control the sprinklers remotely
     public void controlSprinklersRemote(boolean on, ThingSpeakCallback callback) {
         String command = on ? "sprinkler_on" : "sprinkler_off";
+        
+        Log.d(TAG, "Sending sprinkler command: " + command);
+        
         sendCommand(command, callback);
     }
 
     // Send a custom command to ThingSpeak
     public void sendCustomCommand(String command, ThingSpeakCallback callback) {
+        Log.d(TAG, "Sending custom command: " + command);
         sendCommand(command, callback);
     }
 
     // Send command to ThingSpeak
     private void sendCommand(String command, ThingSpeakCallback callback) {
-        try {
-            // URL encode the command to handle special characters
-            String encodedCommand = java.net.URLEncoder.encode(command, "UTF-8");
-            String endpoint = THINGSPEAK_URL + "?api_key=" + WRITE_API_KEY + "&field" + COMMAND_FIELD + "=" + encodedCommand;
-            
-            // Log command for debugging
-            Log.d(TAG, "Sending command to ThingSpeak: " + command);
-            Log.d(TAG, "Encoded command: " + encodedCommand);
-            Log.d(TAG, "Complete endpoint: " + endpoint);
-            
-            executeRequest(endpoint, new ThingSpeakCallback() {
-                @Override
-                public void onSuccess(String response) {
-                    Log.d(TAG, "ThingSpeak response for command [" + command + "]: " + response);
-                    // Check if response is a number (entry ID) indicating successful update
-                    try {
-                        Integer.parseInt(response.trim());
-                        callback.onSuccess(response);
-                    } catch (NumberFormatException e) {
-                        // Not a number, something might be wrong
-                        Log.e(TAG, "ThingSpeak unexpected response format: " + response);
-                        callback.onSuccess(response); // Still treat as success, but log it
-                    }
-                }
-
-                @Override
-                public void onError(String error) {
-                    Log.e(TAG, "ThingSpeak error for command [" + command + "]: " + error);
-                    callback.onError(error);
-                }
-            });
-        } catch (Exception e) {
-            Log.e(TAG, "Error encoding command: " + e.getMessage());
-            callback.onError("Failed to encode command: " + e.getMessage());
-        }
+        String endpoint = THINGSPEAK_URL + "?api_key=" + WRITE_API_KEY + "&field" + COMMAND_FIELD + "=" + command;
+        Log.d(TAG, "ThingSpeak request URL: " + endpoint);
+        executeRequest(endpoint, callback);
     }
 
     // Execute HTTP request in background thread
@@ -135,9 +107,11 @@ public class ThingSpeakClient {
                     in.close();
 
                     final String result = response.toString();
+                    Log.d(TAG, "ThingSpeak response: " + result);
                     mainHandler.post(() -> callback.onSuccess(result));
                 } else {
                     final String error = "HTTP Error: " + responseCode;
+                    Log.e(TAG, error);
                     mainHandler.post(() -> callback.onError(error));
                 }
             } catch (IOException e) {
