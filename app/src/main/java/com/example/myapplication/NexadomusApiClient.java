@@ -73,15 +73,53 @@ public class NexadomusApiClient {
         return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
     }
 
+    // Check if we're connected to Nexadomus network
+    private boolean isConnectedToNexadomus() {
+        if (appContext == null) {
+            Log.e(TAG, "App context is null, cannot check WiFi connection");
+            return false;
+        }
+        
+        WifiManager wifiManager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager == null) {
+            Log.e(TAG, "WiFi manager is null, cannot check WiFi connection");
+            return false;
+        }
+        
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo == null) {
+            Log.e(TAG, "WiFi info is null, cannot check WiFi connection");
+            return false;
+        }
+        
+        String ssid = wifiInfo.getSSID();
+        if (ssid != null) {
+            // Remove quotes if present
+            ssid = ssid.replace("\"", "");
+            Log.d(TAG, "Current SSID: " + ssid + ", Looking for: " + NEXADOMUS_SSID);
+            boolean isConnected = NEXADOMUS_SSID.equals(ssid);
+            Log.d(TAG, "Connected to Nexadomus AP: " + isConnected);
+            return isConnected;
+        }
+        
+        Log.e(TAG, "SSID is null, cannot check WiFi connection");
+        return false;
+    }
+
     // Control the garage door - will use ThingSpeak if no local connection available
     public void controlGarage(String action, ApiCallback callback) {
+        boolean connected = isConnectedToNexadomus();
+        Log.d(TAG, "Control Garage: Connected to Nexadomus? " + connected);
+        
         // Check if we're connected to Nexadomus network
-        if (isConnectedToNexadomus()) {
+        if (connected) {
             // Use direct control via local network
             String endpoint = BASE_URL + "/garage?state=" + action;
+            Log.d(TAG, "Sending local garage command to: " + endpoint);
             executeRequest(endpoint, callback);
         } else if (hasInternetAccess()) {
             // Use ThingSpeak for remote control
+            Log.d(TAG, "Using ThingSpeak for remote garage control: " + action);
             boolean open = action.equals("open") || action.equals("toggle");
             thingSpeakClient.controlGarageRemote(open, new ThingSpeakClient.ThingSpeakCallback() {
                 @Override
@@ -96,6 +134,7 @@ public class NexadomusApiClient {
             });
         } else {
             // No connectivity at all
+            Log.e(TAG, "No connectivity for garage control");
             mainHandler.post(() -> callback.onError("No connectivity. Connect to Nexadomus AP or ensure internet access."));
         }
     }
@@ -144,11 +183,16 @@ public class NexadomusApiClient {
      * @param callback  Callback for success/error
      */
     public void controlSprinklers(String action, ApiCallback callback) {
-        if (isConnectedToNexadomus()) {
+        boolean connected = isConnectedToNexadomus();
+        Log.d(TAG, "Control Sprinklers: Connected to Nexadomus? " + connected);
+        
+        if (connected) {
             // Use direct control via local network
             String endpoint = BASE_URL + "/sprinklers?state=" + action;
+            Log.d(TAG, "Sending local sprinkler command to: " + endpoint);
             executeRequest(endpoint, callback);
         } else if (hasInternetAccess()) {
+            Log.d(TAG, "Using ThingSpeak for remote sprinkler control: " + action);
             // Use ThingSpeak for remote control
             if (action.equals("off")) {
                 // Send direct off command
@@ -160,6 +204,7 @@ public class NexadomusApiClient {
                     int durationSeconds = Integer.parseInt(durationStr);
                     sendCustomCommand("sprinkler_on_" + durationSeconds, callback);
                 } catch (NumberFormatException e) {
+                    Log.e(TAG, "Invalid duration format: " + durationStr);
                     callback.onError("Invalid duration format");
                 }
             } else if (action.startsWith("on&duration=")) {
@@ -172,6 +217,7 @@ public class NexadomusApiClient {
                     sendCustomCommand("sprinkler_on_" + durationSeconds, callback);
                 } catch (NumberFormatException e) {
                     // Fall back to simple on command if duration parsing fails
+                    Log.e(TAG, "Failed to parse duration, falling back to simple on: " + e.getMessage());
                     sendCustomCommand("sprinkler_on", callback);
                 }
             } else if (action.equals("on") || action.equals("toggle")) {
@@ -179,10 +225,12 @@ public class NexadomusApiClient {
                 sendCustomCommand("sprinkler_on", callback);
             } else {
                 // Unknown command
+                Log.e(TAG, "Unknown sprinkler command: " + action);
                 callback.onError("Unknown sprinkler command: " + action);
             }
         } else {
             // No connectivity at all
+            Log.e(TAG, "No connectivity for sprinkler control");
             mainHandler.post(() -> callback.onError("No connectivity. Connect to Nexadomus AP or ensure internet access."));
         }
     }
@@ -236,32 +284,6 @@ public class NexadomusApiClient {
         }
     }
     
-    // Check if connected to Nexadomus hotspot
-    private boolean isConnectedToNexadomus() {
-        if (appContext == null) {
-            return false;
-        }
-        
-        WifiManager wifiManager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
-        if (wifiManager == null) {
-            return false;
-        }
-        
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        if (wifiInfo == null) {
-            return false;
-        }
-        
-        String ssid = wifiInfo.getSSID();
-        if (ssid != null) {
-            // Remove quotes if present
-            ssid = ssid.replace("\"", "");
-            return NEXADOMUS_SSID.equals(ssid);
-        }
-        
-        return false;
-    }
-
     // Execute HTTP request in background thread
     private void executeRequest(final String urlString, final ApiCallback callback) {
         executor.execute(() -> {

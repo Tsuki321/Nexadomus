@@ -81,9 +81,30 @@ public class ThingSpeakClient {
             
             // Log command for debugging
             Log.d(TAG, "Sending command to ThingSpeak: " + command);
+            Log.d(TAG, "Encoded command: " + encodedCommand);
             Log.d(TAG, "Complete endpoint: " + endpoint);
             
-            executeRequest(endpoint, callback);
+            executeRequest(endpoint, new ThingSpeakCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    Log.d(TAG, "ThingSpeak response for command [" + command + "]: " + response);
+                    // Check if response is a number (entry ID) indicating successful update
+                    try {
+                        Integer.parseInt(response.trim());
+                        callback.onSuccess(response);
+                    } catch (NumberFormatException e) {
+                        // Not a number, something might be wrong
+                        Log.e(TAG, "ThingSpeak unexpected response format: " + response);
+                        callback.onSuccess(response); // Still treat as success, but log it
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+                    Log.e(TAG, "ThingSpeak error for command [" + command + "]: " + error);
+                    callback.onError(error);
+                }
+            });
         } catch (Exception e) {
             Log.e(TAG, "Error encoding command: " + e.getMessage());
             callback.onError("Failed to encode command: " + e.getMessage());
