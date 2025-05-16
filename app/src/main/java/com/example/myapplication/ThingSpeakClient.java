@@ -74,8 +74,20 @@ public class ThingSpeakClient {
 
     // Send command to ThingSpeak
     private void sendCommand(String command, ThingSpeakCallback callback) {
-        String endpoint = THINGSPEAK_URL + "?api_key=" + WRITE_API_KEY + "&field" + COMMAND_FIELD + "=" + command;
-        executeRequest(endpoint, callback);
+        try {
+            // URL encode the command to handle special characters
+            String encodedCommand = java.net.URLEncoder.encode(command, "UTF-8");
+            String endpoint = THINGSPEAK_URL + "?api_key=" + WRITE_API_KEY + "&field" + COMMAND_FIELD + "=" + encodedCommand;
+            
+            // Log command for debugging
+            Log.d(TAG, "Sending command to ThingSpeak: " + command);
+            Log.d(TAG, "Complete endpoint: " + endpoint);
+            
+            executeRequest(endpoint, callback);
+        } catch (Exception e) {
+            Log.e(TAG, "Error encoding command: " + e.getMessage());
+            callback.onError("Failed to encode command: " + e.getMessage());
+        }
     }
 
     // Execute HTTP request in background thread

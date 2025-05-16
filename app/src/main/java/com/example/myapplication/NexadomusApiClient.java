@@ -151,8 +151,8 @@ public class NexadomusApiClient {
         } else if (hasInternetAccess()) {
             // Use ThingSpeak for remote control
             if (action.equals("off")) {
-                boolean on = false;
-                thingSpeakClient.controlSprinklersRemote(on, createThingSpeakCallback(callback, "sprinkler_off"));
+                // Send direct off command
+                sendCustomCommand("sprinkler_off", callback);
             } else if (action.startsWith("on&duration_seconds=")) {
                 // Extract duration in seconds
                 String durationStr = action.substring("on&duration_seconds=".length());
@@ -172,13 +172,14 @@ public class NexadomusApiClient {
                     sendCustomCommand("sprinkler_on_" + durationSeconds, callback);
                 } catch (NumberFormatException e) {
                     // Fall back to simple on command if duration parsing fails
-                    boolean on = true;
-                    thingSpeakClient.controlSprinklersRemote(on, createThingSpeakCallback(callback, "sprinkler_on"));
+                    sendCustomCommand("sprinkler_on", callback);
                 }
+            } else if (action.equals("on") || action.equals("toggle")) {
+                // Simple on command - send directly instead of using controlSprinklersRemote
+                sendCustomCommand("sprinkler_on", callback);
             } else {
-                // Simple on command
-                boolean on = action.equals("on") || action.equals("toggle");
-                thingSpeakClient.controlSprinklersRemote(on, createThingSpeakCallback(callback, on ? "sprinkler_on" : "sprinkler_off"));
+                // Unknown command
+                callback.onError("Unknown sprinkler command: " + action);
             }
         } else {
             // No connectivity at all
