@@ -32,5 +32,13 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v3
       with:
-        name: app
-        path: app/build/outputs/apk/debug/app-debug.apk 
+        name: nexadomus-app
+        path: app/build/outputs/apk/debug/app-debug.apk
+        
+    - name: Display download information
+      run: |
+        echo "::notice::APK has been uploaded as an artifact. To download it:"
+        echo "::notice::1. Go to Actions tab in your GitHub repository"
+        echo "::notice::2. Click on this workflow run"
+        echo "::notice::3. Scroll down to the Artifacts section at the bottom of the page"
+        echo "::notice::4. Click on 'nexadomus-app' to download the APK" 

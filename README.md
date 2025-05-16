@@ -19,6 +19,15 @@ Smart home automation application for Android that connects to various IoT devic
 2. Open the project in Android Studio
 3. Build and run the application
 
+## Downloading Latest APK
+
+You can download the latest build directly from GitHub Actions:
+
+1. Go to the [Actions tab](https://github.com/Tsuki321/Nexadomus/actions) in the repository
+2. Click on the most recent successful workflow run
+3. Scroll down to the "Artifacts" section at the bottom of the page
+4. Click on "nexadomus-app" to download the APK
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details. 
