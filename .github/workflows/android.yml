@@ -33,7 +33,9 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: nexadomus-app
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: "**/build/outputs/apk/**/*.apk"
+        retention-days: 14
+        if-no-files-found: error
         
     - name: Display download information
       run: |
