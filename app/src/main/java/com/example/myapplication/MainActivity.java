@@ -29,17 +29,21 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             
-            if (item.getItemId() == R.id.nav_garage) {
+            if (item.getItemId() == R.id.garageFragment) {
                 selectedFragment = new GarageFragment();
-            } else if (item.getItemId() == R.id.nav_sprinklers) {
+            } else if (item.getItemId() == R.id.sprinklersFragment) {
                 selectedFragment = new SprinklersFragment();
-            } else if (item.getItemId() == R.id.nav_lights) {
+            } else if (item.getItemId() == R.id.lightsFragment) {
                 selectedFragment = new LightsFragment();
+            } else if (item.getItemId() == R.id.acFragment) {
+                selectedFragment = new ACFragment();
+            } else if (item.getItemId() == R.id.addDeviceFragment) {
+                selectedFragment = new AddDeviceFragment();
             }
             
             if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, selectedFragment)
+                    .replace(R.id.nav_host_fragment, selectedFragment)
                     .commit();
                 return true;
             }
@@ -48,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         
         // Set default fragment
         getSupportFragmentManager().beginTransaction()
-            .replace(R.id.fragment_container, new GarageFragment())
+            .replace(R.id.nav_host_fragment, new GarageFragment())
             .commit();
         
         // Check WiFi connection status
