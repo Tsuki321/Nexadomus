@@ -103,7 +103,7 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
         
         // Simulate network request with delay
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Add simulated devices
+            // Add simulated devices only if connected to Nexadomus
             if (isConnectedToNexadomus) {
                 // If we're connected to Nexadomus, request available devices from ESP32
                 apiClient.getAvailableDevices(new NexadomusApiClient.ApiCallback() {
@@ -111,47 +111,41 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
                     public void onSuccess(String response) {
                         // Parse device list (in a real implementation)
                         // For now, we'll simulate it
-                        addSimulatedDevices(true);
+                        addSimulatedDevices();
                         
                         // Update UI
-                        updateDiscoveryComplete("Nexadomus device found with several connected devices");
+                        updateDiscoveryComplete("Nexadomus Hub detected with connected devices");
                     }
                     
                     @Override
                     public void onError(String error) {
-                        // Add only default devices
-                        addSimulatedDevices(false);
-                        
                         // Update UI with error
                         updateDiscoveryComplete("Error getting devices: " + error);
                     }
                 });
             } else {
-                // If not connected, just add simulated devices
-                addSimulatedDevices(false);
+                // If not connected, show no devices
                 
                 // Update UI
-                updateDiscoveryComplete("Discovery complete - Not connected to Nexadomus");
+                updateDiscoveryComplete("No Nexadomus Hub detected\nConnect to Nexadomus WiFi network to discover devices");
                 
                 // Show hint toast
                 Toast.makeText(getContext(), 
-                        "Connect to the Nexadomus WiFi to discover more devices", 
+                        "Connect to the Nexadomus WiFi to discover devices", 
                         Toast.LENGTH_LONG).show();
             }
         }, 2000); // 2 second delay to simulate discovery
     }
     
-    private void addSimulatedDevices(boolean includeConnectedDevices) {
-        // Always add the primary Nexadomus controller
+    private void addSimulatedDevices() {
+        // Add the primary Nexadomus controller
         devices.add(new Device("Nexadomus Hub", "Smart Home Controller", R.drawable.ic_hub));
         
-        // Add additional devices if we're supposedly connected to ESP32
-        if (includeConnectedDevices) {
-            devices.add(new Device("Living Room Lights", "Smart Lights", R.drawable.ic_lights));
-            devices.add(new Device("Garage Door", "Smart Garage", R.drawable.ic_garage));
-            devices.add(new Device("Garden Sprinklers", "Irrigation System", R.drawable.ic_sprinklers));
-            devices.add(new Device("Thermostat", "Climate Control", R.drawable.ic_thermostat));
-        }
+        // Add connected devices
+        devices.add(new Device("Living Room Lights", "Smart Lights", R.drawable.ic_lights));
+        devices.add(new Device("Garage Door", "Smart Garage", R.drawable.ic_garage));
+        devices.add(new Device("Garden Sprinklers", "Irrigation System", R.drawable.ic_sprinklers));
+        devices.add(new Device("Thermostat", "Climate Control", R.drawable.ic_thermostat));
         
         // Notify the adapter
         deviceAdapter.notifyDataSetChanged();
