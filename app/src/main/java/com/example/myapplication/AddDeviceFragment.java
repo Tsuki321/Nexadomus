@@ -39,7 +39,13 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
     
     // Get required permissions based on Android version
     private String[] getRequiredPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14+
+            return new String[] {
+                Manifest.permission.NEARBY_WIFI_DEVICES,
+                Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.CHANGE_WIFI_STATE
+            };
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13
             return new String[] {
                 Manifest.permission.NEARBY_WIFI_DEVICES,
                 Manifest.permission.ACCESS_WIFI_STATE,
@@ -127,10 +133,13 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
     public void onResume() {
         super.onResume();
         // Register the WiFi scan receiver
-        requireActivity().registerReceiver(
-                wifiScanReceiver,
-                new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
-        );
+        try {
+            IntentFilter intentFilter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+            requireActivity().registerReceiver(wifiScanReceiver, intentFilter);
+        } catch (IllegalArgumentException e) {
+            // In case receiver was already registered
+            scanStatus.setText("Error registering WiFi receiver: " + e.getMessage());
+        }
         
         // Update button text in case permissions changed while fragment was not visible
         updateButtonText();
@@ -185,12 +194,38 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
     }
 
     private void showPermissionRationaleDialog() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            showModernAndroidPermissionDialog();
+        } else {
+            new AlertDialog.Builder(requireContext())
+                .setTitle("Permissions Required")
+                .setMessage("WiFi scanning requires location permissions to discover nearby networks.")
+                .setPositiveButton("OK", (dialog, which) -> requestPermissions())
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    scanStatus.setText("Cannot scan without required permissions");
+                })
+                .create()
+                .show();
+        }
+    }
+    
+    private void showModernAndroidPermissionDialog() {
+        String androidVersion = Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ? 
+                "Android 14" : "Android 13";
+        
         new AlertDialog.Builder(requireContext())
-            .setTitle("Permissions Required")
-            .setMessage("WiFi scanning requires location permissions to discover nearby networks.")
-            .setPositiveButton("OK", (dialog, which) -> requestPermissions())
+            .setTitle("NEARBY_WIFI_DEVICES Permission Required")
+            .setMessage("On " + androidVersion + ", scanning for WiFi networks requires the NEARBY_WIFI_DEVICES permission. " +
+                    "This permission allows the app to see nearby WiFi networks to connect to your Nexadomus device.\n\n" +
+                    "Please grant this permission in the next dialog to enable WiFi scanning.")
+            .setPositiveButton("Continue", (dialog, which) -> {
+                // Request the permission
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestPermissionLauncher.launch(new String[]{Manifest.permission.NEARBY_WIFI_DEVICES});
+                }
+            })
             .setNegativeButton("Cancel", (dialog, which) -> {
-                scanStatus.setText("Cannot scan without required permissions");
+                scanStatus.setText("Cannot scan without NEARBY_WIFI_DEVICES permission");
             })
             .create()
             .show();
@@ -213,11 +248,17 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
                 }
                 
                 if (!permissionsToRequest.isEmpty()) {
-                    ActivityCompat.requestPermissions(
-                        requireActivity(),
-                        permissionsToRequest.toArray(new String[0]),
-                        PERMISSION_REQUEST_CODE
-                    );
+                    // Use the launcher for Android 13+ to ensure proper runtime permission handling
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        requestPermissionLauncher.launch(permissionsToRequest.toArray(new String[0]));
+                    } else {
+                        // For older versions, use the standard method
+                        ActivityCompat.requestPermissions(
+                            requireActivity(),
+                            permissionsToRequest.toArray(new String[0]),
+                            PERMISSION_REQUEST_CODE
+                        );
+                    }
                 }
             }
         } else {
@@ -244,6 +285,15 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
             } else {
                 scanStatus.setText("Cannot scan without required permissions");
                 btnScan.setText("Request Permissions");
+                
+                // For Android 13+ and 14+, show a toast explaining the importance of the permission
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    String androidVersion = Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ? 
+                            "Android 14+" : "Android 13+";
+                    Toast.makeText(requireContext(), 
+                        "NEARBY_WIFI_DEVICES permission is required to scan for WiFi networks on " + androidVersion, 
+                        Toast.LENGTH_LONG).show();
+                }
             }
         }
     }
@@ -257,9 +307,18 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
         if (allGranted) {
             startWifiScan();
         } else {
-            Toast.makeText(getContext(), 
-                    "Location permissions are needed to scan for WiFi networks", 
-                    Toast.LENGTH_LONG).show();
+            String permissionMsg = "Permission is needed to scan for WiFi networks";
+            
+            // For Android 13/14, specify the NEARBY_WIFI_DEVICES permission
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                String androidVersion = Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ? 
+                        "Android 14" : "Android 13";
+                permissionMsg = "NEARBY_WIFI_DEVICES permission is required on " + androidVersion + " to scan for WiFi networks";
+            } else {
+                permissionMsg = "Location permissions are needed to scan for WiFi networks";
+            }
+            
+            Toast.makeText(getContext(), permissionMsg, Toast.LENGTH_LONG).show();
             scanStatus.setText("Cannot scan without required permissions");
             btnScan.setText("Request Permissions");
         }
@@ -300,55 +359,71 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
 
     private void scanSuccess() {
         // Check for permissions before accessing scan results
-        if (ContextCompat.checkSelfPermission(requireContext(), 
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU 
-                    ? Manifest.permission.NEARBY_WIFI_DEVICES 
-                    : Manifest.permission.ACCESS_FINE_LOCATION) 
+        String requiredPermission;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+ (including Android 14)
+            requiredPermission = Manifest.permission.NEARBY_WIFI_DEVICES;
+        } else {
+            requiredPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+        }
+                
+        if (ContextCompat.checkSelfPermission(requireContext(), requiredPermission) 
                 != PackageManager.PERMISSION_GRANTED) {
             scanStatus.setText("Cannot scan without required permissions");
             btnScan.setText("Request Permissions");
             isScanning = false;
             btnScan.setEnabled(true);
+            
+            // Request permissions again
+            requestPermissions();
             return;
         }
         
-        List<ScanResult> scanResults = wifiManager.getScanResults();
-        devices.clear();
-        
-        boolean foundNexadomus = false;
-        
-        // Process scan results
-        for (ScanResult result : scanResults) {
-            if (result.SSID == null || result.SSID.isEmpty()) {
-                continue; // Skip empty SSIDs
+        try {
+            List<ScanResult> scanResults = wifiManager.getScanResults();
+            devices.clear();
+            
+            boolean foundNexadomus = false;
+            
+            // Process scan results
+            for (ScanResult result : scanResults) {
+                if (result.SSID == null || result.SSID.isEmpty()) {
+                    continue; // Skip empty SSIDs
+                }
+                
+                // Create device from scan result
+                boolean isSecured = !result.capabilities.contains("Open");
+                Device wifiDevice = new Device(result.SSID, result.level, isSecured);
+                
+                // Check if this is our Nexadomus device
+                if (result.SSID.equals("Nexadomus Prototype")) {
+                    foundNexadomus = true;
+                    // Add Nexadomus device first in the list
+                    devices.add(0, wifiDevice);
+                } else {
+                    devices.add(wifiDevice);
+                }
             }
             
-            // Create device from scan result
-            boolean isSecured = !result.capabilities.contains("Open");
-            Device wifiDevice = new Device(result.SSID, result.level, isSecured);
+            // Update UI
+            deviceAdapter.notifyDataSetChanged();
+            isScanning = false;
+            btnScan.setText("Scan Again");
+            btnScan.setEnabled(true);
             
-            // Check if this is our Nexadomus device
-            if (result.SSID.equals("Nexadomus Prototype")) {
-                foundNexadomus = true;
-                // Add Nexadomus device first in the list
-                devices.add(0, wifiDevice);
+            if (devices.isEmpty()) {
+                scanStatus.setText("No WiFi networks found");
+            } else if (foundNexadomus) {
+                scanStatus.setText("Nexadomus device found! " + devices.size() + " total networks found");
             } else {
-                devices.add(wifiDevice);
+                scanStatus.setText(devices.size() + " WiFi networks found");
             }
-        }
-        
-        // Update UI
-        deviceAdapter.notifyDataSetChanged();
-        isScanning = false;
-        btnScan.setText("Scan Again");
-        btnScan.setEnabled(true);
-        
-        if (devices.isEmpty()) {
-            scanStatus.setText("No WiFi networks found");
-        } else if (foundNexadomus) {
-            scanStatus.setText("Nexadomus device found! " + devices.size() + " total networks found");
-        } else {
-            scanStatus.setText(devices.size() + " WiFi networks found");
+        } catch (SecurityException e) {
+            // This can happen on some Android 13/14 devices even with permission granted
+            scanStatus.setText("Permission error: " + e.getMessage());
+            requestPermissions(); // Try requesting permissions again
+            isScanning = false;
+            btnScan.setText("Scan Again");
+            btnScan.setEnabled(true);
         }
     }
 
@@ -358,37 +433,49 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
         btnScan.setText("Scan Again");
         btnScan.setEnabled(true);
         
+        // Check for permissions before accessing scan results
+        String requiredPermission;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+ (including Android 14)
+            requiredPermission = Manifest.permission.NEARBY_WIFI_DEVICES;
+        } else {
+            requiredPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+        }
+                
+        if (ContextCompat.checkSelfPermission(requireContext(), requiredPermission) 
+                != PackageManager.PERMISSION_GRANTED) {
+            scanStatus.setText("Cannot scan without required permissions");
+            btnScan.setText("Request Permissions");
+            // Request permissions again
+            requestPermissions();
+            return;
+        }
+        
         // Show last results if available
-        if (wifiManager != null) {
-            // Check for permissions before accessing scan results
-            if (ContextCompat.checkSelfPermission(requireContext(), 
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU 
-                        ? Manifest.permission.NEARBY_WIFI_DEVICES 
-                        : Manifest.permission.ACCESS_FINE_LOCATION) 
-                    != PackageManager.PERMISSION_GRANTED) {
-                scanStatus.setText("Cannot scan without required permissions");
-                btnScan.setText("Request Permissions");
-                return;
-            }
-            
-            List<ScanResult> lastResults = wifiManager.getScanResults();
-            if (lastResults != null && !lastResults.isEmpty()) {
-                devices.clear();
-                for (ScanResult result : lastResults) {
-                    if (result.SSID != null && !result.SSID.isEmpty()) {
-                        boolean isSecured = !result.capabilities.contains("Open");
-                        devices.add(new Device(result.SSID, result.level, isSecured));
+        try {
+            if (wifiManager != null) {
+                List<ScanResult> lastResults = wifiManager.getScanResults();
+                if (lastResults != null && !lastResults.isEmpty()) {
+                    devices.clear();
+                    for (ScanResult result : lastResults) {
+                        if (result.SSID != null && !result.SSID.isEmpty()) {
+                            boolean isSecured = !result.capabilities.contains("Open");
+                            devices.add(new Device(result.SSID, result.level, isSecured));
+                        }
                     }
+                    deviceAdapter.notifyDataSetChanged();
+                    scanStatus.setText("Using cached results: " + devices.size() + " networks");
+                } else {
+                    // Only show the "Scan failed" message if there are no cached results either
+                    scanStatus.setText("Scan failed. Please try again.");
                 }
-                deviceAdapter.notifyDataSetChanged();
-                scanStatus.setText("Using cached results: " + devices.size() + " networks");
             } else {
-                // Only show the "Scan failed" message if there are no cached results either
+                // Only show the failure message if wifiManager is null
                 scanStatus.setText("Scan failed. Please try again.");
             }
-        } else {
-            // Only show the failure message if wifiManager is null
-            scanStatus.setText("Scan failed. Please try again.");
+        } catch (SecurityException e) {
+            // This can happen on some Android 13/14 devices even with permission granted
+            scanStatus.setText("Permission error: " + e.getMessage());
+            requestPermissions(); // Try requesting permissions again
         }
     }
     

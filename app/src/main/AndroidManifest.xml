@@ -15,7 +15,7 @@
     <!-- For Android 13+ (API 33+), we need the NEARBY_WIFI_DEVICES permission -->
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" 
                      android:usesPermissionFlags="neverForLocation"
-                     tools:targetApi="s" />
+                     tools:targetApi="33" />
 
     <application
         android:allowBackup="true"

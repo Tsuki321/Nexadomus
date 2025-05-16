@@ -242,7 +242,30 @@ public class NexadomusApiClient {
         // This only works when connected to the local network
         if (isConnectedToNexadomus()) {
             String endpoint = BASE_URL + "/status";
-            executeRequest(endpoint, callback);
+            executeRequest(endpoint, new ApiCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    // Log the operating mode from the ESP32
+                    try {
+                        // Check if response contains operating_mode
+                        if (response.contains("operating_mode")) {
+                            String mode = response.contains("local_only") ? 
+                                    "LOCAL-ONLY MODE" : "INTERNET-CONNECTED MODE";
+                            Log.d(TAG, "ESP32 operating in: " + mode);
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error parsing operating mode: " + e.getMessage());
+                    }
+                    
+                    // Pass the response to the original callback
+                    callback.onSuccess(response);
+                }
+                
+                @Override
+                public void onError(String error) {
+                    callback.onError(error);
+                }
+            });
         } else {
             // Use a consistent error message pattern that the fragments can detect to switch to remote mode
             mainHandler.post(() -> callback.onError("Failed to connect: Not connected to Nexadomus network. Status check requires local connection."));
