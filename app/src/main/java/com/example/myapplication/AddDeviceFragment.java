@@ -149,7 +149,7 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
         if (includeConnectedDevices) {
             devices.add(new Device("Living Room Lights", "Smart Lights", R.drawable.ic_lights));
             devices.add(new Device("Garage Door", "Smart Garage", R.drawable.ic_garage));
-            devices.add(new Device("Garden Sprinklers", "Irrigation System", R.drawable.ic_sprinkler));
+            devices.add(new Device("Garden Sprinklers", "Irrigation System", R.drawable.ic_sprinklers));
             devices.add(new Device("Thermostat", "Climate Control", R.drawable.ic_thermostat));
         }
         
