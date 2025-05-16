@@ -299,6 +299,19 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
     }
 
     private void scanSuccess() {
+        // Check for permissions before accessing scan results
+        if (ContextCompat.checkSelfPermission(requireContext(), 
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU 
+                    ? Manifest.permission.NEARBY_WIFI_DEVICES 
+                    : Manifest.permission.ACCESS_FINE_LOCATION) 
+                != PackageManager.PERMISSION_GRANTED) {
+            scanStatus.setText("Cannot scan without required permissions");
+            btnScan.setText("Request Permissions");
+            isScanning = false;
+            btnScan.setEnabled(true);
+            return;
+        }
+        
         List<ScanResult> scanResults = wifiManager.getScanResults();
         devices.clear();
         
@@ -347,6 +360,17 @@ public class AddDeviceFragment extends Fragment implements DeviceAdapter.OnDevic
         
         // Show last results if available
         if (wifiManager != null) {
+            // Check for permissions before accessing scan results
+            if (ContextCompat.checkSelfPermission(requireContext(), 
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU 
+                        ? Manifest.permission.NEARBY_WIFI_DEVICES 
+                        : Manifest.permission.ACCESS_FINE_LOCATION) 
+                    != PackageManager.PERMISSION_GRANTED) {
+                scanStatus.setText("Cannot scan without required permissions");
+                btnScan.setText("Request Permissions");
+                return;
+            }
+            
             List<ScanResult> lastResults = wifiManager.getScanResults();
             if (lastResults != null && !lastResults.isEmpty()) {
                 devices.clear();
