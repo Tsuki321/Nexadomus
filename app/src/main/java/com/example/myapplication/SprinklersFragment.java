@@ -552,11 +552,10 @@ public class SprinklersFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_help) {
-            HelpDialogUtil.showHelpDialog(getContext(), "Sprinkler Controls",
-                    "• On: Turn on sprinklers\n" +
-                    "• Off: Turn off sprinklers\n" +
-                    "• Schedule: Set days and time for automatic operation\n\n" +
-                    "The scheduler will turn sprinklers on and off automatically based on the set schedule.");
+            // Show a simple toast message instead of using the non-existent dialog method
+            Toast.makeText(getContext(), 
+                    "Sprinkler Controls: Turn sprinklers on/off or set an automatic schedule.",
+                    Toast.LENGTH_LONG).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
