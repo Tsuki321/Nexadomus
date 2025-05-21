@@ -91,8 +91,8 @@ public class ThingSpeakClient {
                 URL url = new URL(urlString);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
+                connection.setConnectTimeout(10000); // Increased timeout to 10 seconds
+                connection.setReadTimeout(10000);    // Increased timeout to 10 seconds
 
                 int responseCode = connection.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -110,12 +110,29 @@ public class ThingSpeakClient {
                     Log.d(TAG, "ThingSpeak response: " + result);
                     mainHandler.post(() -> callback.onSuccess(result));
                 } else {
-                    final String error = "HTTP Error: " + responseCode;
+                    String errorDetails = "";
+                    try {
+                        // Try to get error details from the error stream
+                        BufferedReader errorReader = new BufferedReader(
+                                new InputStreamReader(connection.getErrorStream()));
+                        String errorLine;
+                        StringBuilder errorResponse = new StringBuilder();
+                        while ((errorLine = errorReader.readLine()) != null) {
+                            errorResponse.append(errorLine);
+                        }
+                        errorReader.close();
+                        errorDetails = errorResponse.toString();
+                    } catch (Exception e) {
+                        errorDetails = "No additional error details available";
+                    }
+                    
+                    final String error = "HTTP Error: " + responseCode + " (" + connection.getResponseMessage() + ")" +
+                                         (errorDetails.isEmpty() ? "" : " - " + errorDetails);
                     Log.e(TAG, error);
                     mainHandler.post(() -> callback.onError(error));
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Network error: " + e.getMessage());
+                Log.e(TAG, "Network error: " + e.getMessage(), e);
                 final String errorMsg = "Network error: " + e.getMessage();
                 mainHandler.post(() -> callback.onError(errorMsg));
             } finally {

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <base-config cleartextTrafficPermitted="true">
+    <!-- Default configuration for all domains - don't allow cleartext traffic in general -->
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>
     </base-config>
-    <!-- Allow cleartext traffic to our ESP32 device -->
+    
+    <!-- Allow cleartext traffic only to our ESP32 device -->
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">192.168.4.1</domain>
+        <domain includeSubdomains="false">192.168.4.1</domain>
     </domain-config>
 </network-security-config> 

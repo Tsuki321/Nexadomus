@@ -137,57 +137,25 @@ public class NexadomusApiClient {
         }
     }
 
-    /**
-     * Control the sprinklers (on/off with duration)
-     *
-     * @param action    Command string (on, off, on&duration_seconds=X) 
-     * @param callback  Callback for success/error
-     */
+    // Control sprinklers via API
     public void controlSprinklers(String action, ApiCallback callback) {
+        // Check if we have a network connection
         if (isConnectedToNexadomus()) {
-            // Use direct control via local network
-            String endpoint = BASE_URL + "/sprinklers?state=" + action;
-            Log.d(TAG, "Local sprinkler endpoint: " + endpoint);
-            executeRequest(endpoint, callback);
+            // Local connection to ESP32
+            String url = BASE_URL + "/sprinklers?state=" + action;
+            executeRequest(url, callback);
         } else if (hasInternetAccess()) {
             // Use ThingSpeak for remote control
-            Log.d(TAG, "Using ThingSpeak to control sprinklers, action: " + action);
-            
-            if (action.equals("off")) {
-                Log.d(TAG, "Sending sprinkler_off command to ThingSpeak");
-                boolean on = false;
-                thingSpeakClient.controlSprinklersRemote(on, createThingSpeakCallback(callback, "sprinkler_off"));
-            } else if (action.startsWith("on&duration_seconds=")) {
-                // Extract duration in seconds
-                String durationStr = action.substring("on&duration_seconds=".length());
-                try {
-                    int durationSeconds = Integer.parseInt(durationStr);
-                    Log.d(TAG, "Sending timed sprinkler command: sprinkler_on_" + durationSeconds);
-                    sendCustomCommand("sprinkler_on_" + durationSeconds, callback);
-                } catch (NumberFormatException e) {
-                    Log.e(TAG, "Invalid duration format: " + durationStr);
-                    callback.onError("Invalid duration format");
-                }
-            } else if (action.startsWith("on&duration=")) {
-                // Handle duration in minutes (original format)
-                String durationStr = action.substring("on&duration=".length());
-                try {
-                    int duration = Integer.parseInt(durationStr);
-                    // Convert minutes to seconds
-                    int durationSeconds = duration * 60;
-                    Log.d(TAG, "Sending timed sprinkler command in minutes: sprinkler_on_" + durationSeconds);
-                    sendCustomCommand("sprinkler_on_" + durationSeconds, callback);
-                } catch (NumberFormatException e) {
-                    Log.e(TAG, "Invalid duration format, falling back to simple on: " + durationStr);
-                    // Fall back to simple on command if duration parsing fails
-                    boolean on = true;
-                    thingSpeakClient.controlSprinklersRemote(on, createThingSpeakCallback(callback, "sprinkler_on"));
-                }
-            } else if (action.equals("on") || action.equals("toggle")) {
-                // Simple on command - Fix: explicitly set to true
+            if (action.equals("on")) {
+                // Simple on command
                 Log.d(TAG, "Sending simple sprinkler_on command to ThingSpeak");
                 boolean on = true;
                 thingSpeakClient.controlSprinklersRemote(on, createThingSpeakCallback(callback, "sprinkler_on"));
+            } else if (action.equals("off")) {
+                // Off command
+                Log.d(TAG, "Sending sprinkler_off command to ThingSpeak");
+                boolean on = false;
+                thingSpeakClient.controlSprinklersRemote(on, createThingSpeakCallback(callback, "sprinkler_off"));
             } else {
                 // Unknown command, log and send as is
                 Log.d(TAG, "Unknown sprinkler command: " + action + ", sending directly");
@@ -197,6 +165,11 @@ public class NexadomusApiClient {
             // No connectivity at all
             mainHandler.post(() -> callback.onError("No connectivity. Connect to Nexadomus AP or ensure internet access."));
         }
+    }
+
+    // Add a helper method to get sprinkler status specifically
+    public void getSprinklersStatus(ApiCallback callback) {
+        getStatus(callback);
     }
 
     /**
@@ -346,11 +319,17 @@ public class NexadomusApiClient {
                     final String result = response.toString();
                     mainHandler.post(() -> callback.onSuccess(result));
                 } else {
-                    final String error = "HTTP Error: " + responseCode;
+                    final String error = "HTTP Error: " + responseCode + " - " + connection.getResponseMessage();
                     mainHandler.post(() -> callback.onError(error));
                 }
+            } catch (java.net.SocketTimeoutException e) {
+                Log.e(TAG, "Connection timed out: " + e.getMessage());
+                mainHandler.post(() -> callback.onError("Connection timed out. Please check if the Nexadomus device is powered on."));
+            } catch (java.net.UnknownHostException e) {
+                Log.e(TAG, "Unknown host: " + e.getMessage());
+                mainHandler.post(() -> callback.onError("Could not find the Nexadomus device. Are you connected to the right network?"));
             } catch (IOException e) {
-                Log.e(TAG, "Network error: " + e.getMessage());
+                Log.e(TAG, "Network error: " + e.getMessage(), e);
                 final String errorMsg = "Network error: " + e.getMessage();
                 mainHandler.post(() -> callback.onError(errorMsg));
             } finally {

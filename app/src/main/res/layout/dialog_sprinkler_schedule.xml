@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Days of week -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Days"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/checkboxSunday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sunday" />
+
+        <CheckBox
+            android:id="@+id/checkboxMonday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monday" />
+
+        <CheckBox
+            android:id="@+id/checkboxTuesday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tuesday" />
+
+        <CheckBox
+            android:id="@+id/checkboxWednesday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wednesday" />
+
+        <CheckBox
+            android:id="@+id/checkboxThursday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thursday" />
+
+        <CheckBox
+            android:id="@+id/checkboxFriday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Friday" />
+
+        <CheckBox
+            android:id="@+id/checkboxSaturday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Saturday"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Start time selection -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start Time"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/timeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start time: 06:00:00"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <NumberPicker
+                    android:id="@+id/hourPicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hour" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <NumberPicker
+                    android:id="@+id/minutePicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Minute" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <NumberPicker
+                    android:id="@+id/secondPicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Second" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Duration selection -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duration"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/durationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duration: 30:00"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <NumberPicker
+                    android:id="@+id/durationMinutesPicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Minute" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <NumberPicker
+                    android:id="@+id/durationSecondsPicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Second" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView> 
