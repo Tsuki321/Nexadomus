@@ -85,19 +85,11 @@ public class GarageFragment extends Fragment {
 
         // Set click listeners for the buttons
         btnOpenGarage.setOnClickListener(v -> {
-            if (!isGarageOpen) {
-                controlGarage("open");
-            } else {
-                Toast.makeText(getContext(), "Garage is already open", Toast.LENGTH_SHORT).show();
-            }
+            controlGarage("open");
         });
 
         btnCloseGarage.setOnClickListener(v -> {
-            if (isGarageOpen) {
-                controlGarage("close");
-            } else {
-                Toast.makeText(getContext(), "Garage is already closed", Toast.LENGTH_SHORT).show();
-            }
+            controlGarage("close");
         });
     }
 
@@ -225,10 +217,10 @@ public class GarageFragment extends Fragment {
             statusText.setText("Status: " + (isGarageOpen ? "Open" : "Closed"));
         }
         
-        // Update button visibility based on current state
+        // Keep both buttons enabled regardless of state
         if (btnOpenGarage != null && btnCloseGarage != null) {
-            btnOpenGarage.setEnabled(!isGarageOpen);
-            btnCloseGarage.setEnabled(isGarageOpen);
+            btnOpenGarage.setEnabled(true);
+            btnCloseGarage.setEnabled(true);
         }
     }
     
