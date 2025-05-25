@@ -85,9 +85,10 @@ public class MainActivity extends AppCompatActivity {
         
         if (id == R.id.action_help) {
             // Show help dialog using existing HelpDialogUtil
-            HelpDialogUtil.showHelpDialog(this, "Need help with Nexadomus?", 
-                    "Nexadomus allows you to control your smart home devices remotely. " +
-                    "Navigate to each device control using the buttons on the Home screen.");
+            HelpDialogUtil.showHelpDialog(this, "Local Mode Connection", 
+                    "If for some reason you are unable to command the Devices through Remote mode, try switching to Local mode by connecting to the Hotspot of the ESP32.\n\n" +
+                    "SSID: Nexadomus Home\n" +
+                    "Password: smartHome1234");
             return true;
         }
         

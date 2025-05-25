@@ -32,9 +32,10 @@ public class SettingsFragment extends Fragment {
         });
         
         helpButton.setOnClickListener(v -> {
-            HelpDialogUtil.showHelpDialog(requireContext(), "Need help with Nexadomus?", 
-                "Nexadomus allows you to control your smart home devices remotely. " +
-                "Navigate to each device control using the buttons on the Home screen.");
+            HelpDialogUtil.showHelpDialog(requireContext(), "Local Mode Connection", 
+                "If for some reason you are unable to command the Devices through Remote mode, try switching to Local mode by connecting to the Hotspot of the ESP32.\n\n" +
+                "SSID: Nexadomus Home\n" +
+                "Password: smartHome1234");
         });
         
         wifiSettingsButton.setOnClickListener(v -> {
