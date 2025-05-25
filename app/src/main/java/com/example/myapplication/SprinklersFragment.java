@@ -222,13 +222,14 @@ public class SprinklersFragment extends Fragment {
                     
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(getContext(), "Failed to parse status data", Toast.LENGTH_SHORT).show();
+                    // Silently log the error instead of showing to the user
                 }
             }
 
             @Override
             public void onError(String error) {
-                Toast.makeText(getContext(), "Failed to fetch status: " + error, Toast.LENGTH_SHORT).show();
+                // Silently log the error instead of showing it to the user
+                System.out.println("Status update failed: " + error);
             }
         });
     }
