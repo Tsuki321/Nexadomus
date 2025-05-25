@@ -194,11 +194,11 @@ public class GarageFragment extends Fragment {
         
         if (connectionModeText != null) {
             if (isRemote) {
-                connectionModeText.setText("Mode: REMOTE (ThingSpeak)");
-                connectionModeText.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+                connectionModeText.setText("Mode: Remote (ThingSpeak)");
+                connectionModeText.setBackgroundResource(R.drawable.bg_remote_mode);
             } else {
-                connectionModeText.setText("Mode: LOCAL (Direct Connection)");
-                connectionModeText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                connectionModeText.setText("Mode: Direct Connection");
+                connectionModeText.setBackgroundResource(R.drawable.bg_local_mode);
             }
         }
     }

@@ -22,76 +22,115 @@
         android:id="@+id/connectionModeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mode: LOCAL (Direct Connection)"
+        android:text="Mode: Direct Connection"
         android:textSize="16sp"
-        android:textColor="@android:color/holo_green_dark"
+        android:padding="8dp"
+        android:background="@drawable/bg_local_mode"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintTop_toBottomOf="@id/titleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/connectionModeText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.2">
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <TextView
-            android:id="@+id/statusText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Light Level: Off (0)"
-            android:textSize="18sp"
-            android:layout_marginBottom="24dp"
-            android:gravity="center"/>
-
-        <SeekBar
-            android:id="@+id/brightnessSlider"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="255"
-            android:progress="0"
-            android:layout_marginBottom="32dp"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
 
-        <Button
-            android:id="@+id/btnHigh"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="High Brightness"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.Button"/>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/statusCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
-        <Button
-            android:id="@+id/btnMedium"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="Medium Brightness"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.Button"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center">
 
-        <Button
-            android:id="@+id/btnLow"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="Low Brightness"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.Button"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Current Status"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"/>
 
-        <Button
-            android:id="@+id/btnOff"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="OFF"
-            style="@style/Widget.MaterialComponents.Button"/>
+                    <TextView
+                        android:id="@+id/statusText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Light Level: Off (0)"
+                        android:textSize="20sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-    </LinearLayout>
+            <SeekBar
+                android:id="@+id/brightnessSlider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="255"
+                android:progress="0"
+                android:layout_marginBottom="24dp"/>
+
+            <Button
+                android:id="@+id/btnHigh"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="High Brightness"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.MaterialComponents.Button"/>
+
+            <Button
+                android:id="@+id/btnMedium"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="Medium Brightness"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.MaterialComponents.Button"/>
+
+            <Button
+                android:id="@+id/btnLow"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="Low Brightness"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.MaterialComponents.Button"/>
+
+            <Button
+                android:id="@+id/btnOff"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="OFF"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.MaterialComponents.Button"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Control your lights remotely."
+                android:textAlignment="center"
+                android:layout_marginHorizontal="32dp"
+                android:textSize="14sp"
+                android:textStyle="italic"/>
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout> 

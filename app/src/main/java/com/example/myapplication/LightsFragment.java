@@ -213,16 +213,16 @@ public class LightsFragment extends Fragment {
         remoteMode = isRemote;
         if (connectionModeText != null) {
             if (isRemote) {
-                connectionModeText.setText("Mode: REMOTE (ThingSpeak)");
-                connectionModeText.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+                connectionModeText.setText("Mode: Remote (ThingSpeak)");
+                connectionModeText.setBackgroundResource(R.drawable.bg_remote_mode);
                 
                 // In remote mode, disable the slider since we can only use preset levels
                 if (brightnessSlider != null) {
                     brightnessSlider.setEnabled(false);
                 }
             } else {
-                connectionModeText.setText("Mode: LOCAL (Direct Connection)");
-                connectionModeText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                connectionModeText.setText("Mode: Direct Connection");
+                connectionModeText.setBackgroundResource(R.drawable.bg_local_mode);
                 
                 // In local mode, enable the slider for precise control
                 if (brightnessSlider != null) {
