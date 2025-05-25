@@ -21,4 +21,19 @@ public class HelpDialogUtil {
             .create()
             .show();
     }
+    
+    /**
+     * Shows a customizable help dialog
+     * @param context The current context
+     * @param title The title of the dialog
+     * @param message The message to display
+     */
+    public static void showHelpDialog(Context context, String title, String message) {
+        new AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .create()
+            .show();
+    }
 } 
