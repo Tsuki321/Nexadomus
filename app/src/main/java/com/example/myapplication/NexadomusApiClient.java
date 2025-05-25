@@ -167,6 +167,37 @@ public class NexadomusApiClient {
         }
     }
 
+    // Control A/C via API
+    public void controlAC(String action, ApiCallback callback) {
+        // Check if we have a network connection
+        if (isConnectedToNexadomus()) {
+            // Local connection to ESP32
+            String url = BASE_URL + "/ac?state=" + action;
+            executeRequest(url, callback);
+        } else if (hasInternetAccess()) {
+            // Use ThingSpeak for remote control
+            if (action.equals("on")) {
+                boolean on = true;
+                thingSpeakClient.controlACRemote(on, createThingSpeakCallback(callback, "ac_on"));
+            } else if (action.equals("off")) {
+                boolean on = false;
+                thingSpeakClient.controlACRemote(on, createThingSpeakCallback(callback, "ac_off"));
+            } else if (action.equals("toggle")) {
+                // For toggle, we need to know current state which we don't have locally
+                // So we'll send the toggle command to the ESP32 through ThingSpeak
+                thingSpeakClient.sendCustomCommand("ac_toggle", createThingSpeakCallback(callback, "ac_toggle"));
+            }
+        } else {
+            // No connectivity at all
+            mainHandler.post(() -> callback.onError("No connectivity. Connect to Nexadomus AP or ensure internet access."));
+        }
+    }
+
+    // Add a helper method to get A/C status specifically
+    public void getACStatus(ApiCallback callback) {
+        getStatus(callback);
+    }
+
     // Add a helper method to get sprinkler status specifically
     public void getSprinklersStatus(ApiCallback callback) {
         getStatus(callback);

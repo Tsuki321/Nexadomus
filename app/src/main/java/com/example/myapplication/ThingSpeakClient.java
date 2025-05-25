@@ -69,6 +69,15 @@ public class ThingSpeakClient {
         
         sendCommand(command, callback);
     }
+    
+    // Send command to control the A/C remotely
+    public void controlACRemote(boolean on, ThingSpeakCallback callback) {
+        String command = on ? "ac_on" : "ac_off";
+        
+        Log.d(TAG, "Sending A/C command: " + command);
+        
+        sendCommand(command, callback);
+    }
 
     // Send a custom command to ThingSpeak
     public void sendCustomCommand(String command, ThingSpeakCallback callback) {

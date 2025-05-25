@@ -17,15 +17,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import org.json.JSONObject;
+
 public class ACFragment extends Fragment {
     private static final String PREFS_NAME = "NexadomusAC";
     private static final String PREF_AC_STATE = "acState";
+    private static final String PREF_REMOTE_MODE = "remoteMode";
     
     private TextView statusText;
     private TextView connectionModeText;
     private boolean isACOn = false;
     private SharedPreferences sharedPreferences;
     private NexadomusApiClient apiClient;
+    private Button btnOn;
+    private Button btnOff;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,41 +58,125 @@ public class ACFragment extends Fragment {
 
         statusText = view.findViewById(R.id.statusText);
         connectionModeText = view.findViewById(R.id.connectionModeText);
-        Button btnOn = view.findViewById(R.id.btnOn);
-        Button btnOff = view.findViewById(R.id.btnOff);
+        btnOn = view.findViewById(R.id.btnOn);
+        btnOff = view.findViewById(R.id.btnOff);
         
-        // Update initial status
+        // Check current status when fragment is created
+        fetchCurrentStatus();
+        
+        // Update initial status based on stored preference
         updateStatus();
 
         btnOn.setOnClickListener(v -> {
-            isACOn = true;
-            saveACState();
-            updateStatus();
-            // TODO: Implement AC power on logic
-            // For now, just show a toast message
-            Toast.makeText(getContext(), "AC On command sent", Toast.LENGTH_SHORT).show();
+            setButtonsEnabled(false);
+            apiClient.controlAC("on", new NexadomusApiClient.ApiCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    if (response.contains("Remote command sent")) {
+                        // This was a remote command via ThingSpeak
+                        showRemoteMode(true);
+                        Toast.makeText(getContext(), "Remote command sent: A/C on", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Local command
+                        showRemoteMode(false);
+                        Toast.makeText(getContext(), "Manual command: A/C on", Toast.LENGTH_SHORT).show();
+                    }
+                    isACOn = true;
+                    saveACState();
+                    updateStatus();
+                    setButtonsEnabled(true);
+                }
+
+                @Override
+                public void onError(String error) {
+                    showError("Failed to turn on A/C: " + error);
+                    setButtonsEnabled(true);
+                }
+            });
         });
 
         btnOff.setOnClickListener(v -> {
-            isACOn = false;
-            saveACState();
-            updateStatus();
-            // TODO: Implement AC power off logic
-            // For now, just show a toast message
-            Toast.makeText(getContext(), "AC Off command sent", Toast.LENGTH_SHORT).show();
+            setButtonsEnabled(false);
+            apiClient.controlAC("off", new NexadomusApiClient.ApiCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    if (response.contains("Remote command sent")) {
+                        showRemoteMode(true);
+                        Toast.makeText(getContext(), "Remote command sent: A/C off", Toast.LENGTH_SHORT).show();
+                    } else {
+                        showRemoteMode(false);
+                        Toast.makeText(getContext(), "Manual command: A/C off", Toast.LENGTH_SHORT).show();
+                    }
+                    isACOn = false;
+                    saveACState();
+                    updateStatus();
+                    setButtonsEnabled(true);
+                }
+
+                @Override
+                public void onError(String error) {
+                    showError("Failed to turn off A/C: " + error);
+                    setButtonsEnabled(true);
+                }
+            });
         });
     }
     
     @Override
     public void onResume() {
         super.onResume();
-        // Refresh from saved state when fragment becomes visible
-        isACOn = sharedPreferences.getBoolean(PREF_AC_STATE, false);
-        updateStatus();
+        
+        // First check if we were previously in remote mode
+        boolean wasInRemoteMode = sharedPreferences.getBoolean(PREF_REMOTE_MODE, false);
+        if (wasInRemoteMode) {
+            showRemoteMode(true);
+        }
+        
+        // Try to refresh status when fragment becomes visible
+        fetchCurrentStatus();
+    }
+    
+    private void fetchCurrentStatus() {
+        apiClient.getACStatus(new NexadomusApiClient.ApiCallback() {
+            @Override
+            public void onSuccess(String response) {
+                try {
+                    JSONObject json = new JSONObject(response);
+                    
+                    // Update A/C status
+                    if (json.has("ac")) {
+                        boolean acState = json.getBoolean("ac");
+                        isACOn = acState;
+                        saveACState();
+                        updateStatus();
+                    }
+                    
+                    // Check if we're in remote mode
+                    if (json.has("operating_mode")) {
+                        String mode = json.getString("operating_mode");
+                        boolean isRemote = !mode.equals("local_only");
+                        showRemoteMode(isRemote);
+                    }
+                    
+                } catch (Exception e) {
+                    // Log error but don't show to user to avoid confusion
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                // Non-fatal error, just log it
+                error = "Status update failed: " + error;
+                System.out.println(error);
+            }
+        });
     }
     
     private void saveACState() {
-        sharedPreferences.edit().putBoolean(PREF_AC_STATE, isACOn).apply();
+        sharedPreferences.edit()
+            .putBoolean(PREF_AC_STATE, isACOn)
+            .apply();
     }
 
     private void updateStatus() {
@@ -103,7 +192,20 @@ public class ACFragment extends Fragment {
                 connectionModeText.setText("Mode: LOCAL (Direct Connection)");
                 connectionModeText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
             }
+            // Save the mode for later reference
+            sharedPreferences.edit()
+                .putBoolean(PREF_REMOTE_MODE, isRemote)
+                .apply();
         }
+    }
+    
+    private void setButtonsEnabled(boolean enabled) {
+        if (btnOn != null) btnOn.setEnabled(enabled);
+        if (btnOff != null) btnOff.setEnabled(enabled);
+    }
+    
+    private void showError(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
     @Override
