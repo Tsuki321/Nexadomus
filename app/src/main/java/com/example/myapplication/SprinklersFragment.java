@@ -43,6 +43,7 @@ public class SprinklersFragment extends Fragment {
     private List<CheckBox> dayCheckboxes = new ArrayList<>();
     private boolean[] scheduledDays = new boolean[7]; // Sun, Mon, Tue, Wed, Thu, Fri, Sat
     private TextView scheduleText;
+    private TextView statusText;
     private TextView connectionModeText;
     private Button btnOn;
     private Button btnOff;
@@ -84,6 +85,10 @@ public class SprinklersFragment extends Fragment {
         scheduleText = view.findViewById(R.id.scheduleText);
         btnSchedule = view.findViewById(R.id.btnSchedule);
         connectionModeText = view.findViewById(R.id.connectionModeText);
+        statusText = view.findViewById(R.id.statusText);
+        
+        // Initialize status display
+        updateStatusText();
 
         // Check current status when fragment is created
         fetchCurrentStatus();
@@ -111,6 +116,7 @@ public class SprinklersFragment extends Fragment {
                     // Update UI to reflect that sprinklers should be on
                     isSprinklerOn = true;
                     setButtonsEnabled(true);
+                    updateStatusText();
                 }
 
                 @Override
@@ -137,6 +143,7 @@ public class SprinklersFragment extends Fragment {
                     }
                     isSprinklerOn = false;
                     setButtonsEnabled(true);
+                    updateStatusText();
                 }
 
                 @Override
@@ -175,6 +182,7 @@ public class SprinklersFragment extends Fragment {
                     if (json.has("sprinkler")) {
                         int sprinklerAngle = json.getInt("sprinkler");
                         isSprinklerOn = (sprinklerAngle == 180);
+                        updateStatusText();
                     }
                     
                     // Check if we're in remote mode
@@ -560,5 +568,11 @@ public class SprinklersFragment extends Fragment {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateStatusText() {
+        if (statusText != null) {
+            statusText.setText("Status: " + (isSprinklerOn ? "On" : "Off"));
+        }
     }
 } 
