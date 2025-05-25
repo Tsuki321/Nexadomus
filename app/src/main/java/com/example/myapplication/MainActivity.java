@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String NEXADOMUS_SSID = "Nexadomus Home";
     private NavController navController;
     private BottomNavigationView bottomNav;
+    private NavOptions navOptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +51,11 @@ public class MainActivity extends AppCompatActivity {
                     .build();
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
             
-            // Connect the BottomNavigationView with custom navigation
+            // Connect the BottomNavigationView
             bottomNav = findViewById(R.id.bottom_navigation);
             
-            // Initialize with the shared menu
-            getMenuInflater().inflate(R.menu.bottom_nav_menu, bottomNav.getMenu());
-            
             // Create navigation options with no animations
-            NavOptions navOptions = new NavOptions.Builder()
+            navOptions = new NavOptions.Builder()
                 .setLaunchSingleTop(true)
                 .setEnterAnim(0)
                 .setExitAnim(0)
@@ -65,45 +63,17 @@ public class MainActivity extends AppCompatActivity {
                 .setPopExitAnim(0)
                 .build();
             
-            // Set up navigation listener once
-            bottomNav.setOnItemSelectedListener(item -> {
-                int id = item.getItemId();
-                int currentDestId = navController.getCurrentDestination().getId();
-                
-                if (id == R.id.homeFragment && currentDestId != R.id.homeFragment) {
-                    navController.navigate(R.id.homeFragment, null, navOptions);
-                } else if (id == R.id.settingsFragment && currentDestId != R.id.settingsFragment) {
-                    navController.navigate(R.id.settingsFragment, null, navOptions);
-                }
-                
-                return true;
-            });
+            // Set up bottom navigation
+            setupBottomNavigation();
             
-            // Update selected item when destination changes
+            // Listen for destination changes to update selection
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-                // Temporarily disable the listener to avoid triggering navigation
-                bottomNav.setOnItemSelectedListener(null);
-                
-                // Update the selection
+                // Just update the selected item without triggering the listener
                 if (destination.getId() == R.id.homeFragment) {
                     bottomNav.setSelectedItemId(R.id.homeFragment);
                 } else if (destination.getId() == R.id.settingsFragment) {
                     bottomNav.setSelectedItemId(R.id.settingsFragment);
                 }
-                
-                // Re-add the listener
-                bottomNav.setOnItemSelectedListener(item -> {
-                    int id = item.getItemId();
-                    int currentDestId = navController.getCurrentDestination().getId();
-                    
-                    if (id == R.id.homeFragment && currentDestId != R.id.homeFragment) {
-                        navController.navigate(R.id.homeFragment, null, navOptions);
-                    } else if (id == R.id.settingsFragment && currentDestId != R.id.settingsFragment) {
-                        navController.navigate(R.id.settingsFragment, null, navOptions);
-                    }
-                    
-                    return true;
-                });
             });
         }
         
@@ -111,9 +81,34 @@ public class MainActivity extends AppCompatActivity {
         checkWiFiConnection();
     }
     
+    /**
+     * Set up the bottom navigation with menu items and navigation
+     */
+    private void setupBottomNavigation() {
+        // Clear existing menu items first
+        bottomNav.getMenu().clear();
+        
+        // Inflate the menu
+        getMenuInflater().inflate(R.menu.bottom_nav_menu, bottomNav.getMenu());
+        
+        // Set up navigation listener
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            int currentDestId = navController.getCurrentDestination().getId();
+            
+            if (id == R.id.homeFragment && currentDestId != R.id.homeFragment) {
+                navController.navigate(R.id.homeFragment, null, navOptions);
+            } else if (id == R.id.settingsFragment && currentDestId != R.id.settingsFragment) {
+                navController.navigate(R.id.settingsFragment, null, navOptions);
+            }
+            
+            return true;
+        });
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        // Empty menu for now, we removed the help icon
         return true;
     }
     
