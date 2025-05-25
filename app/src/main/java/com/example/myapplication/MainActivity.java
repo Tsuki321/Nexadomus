@@ -53,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
             // Connect the BottomNavigationView with custom navigation
             bottomNav = findViewById(R.id.bottom_navigation);
             
+            // Initialize with the shared menu
+            getMenuInflater().inflate(R.menu.bottom_nav_menu, bottomNav.getMenu());
+            
             // Create navigation options with no animations
             NavOptions navOptions = new NavOptions.Builder()
                 .setLaunchSingleTop(true)
@@ -62,54 +65,41 @@ public class MainActivity extends AppCompatActivity {
                 .setPopExitAnim(0)
                 .build();
             
-            // Update bottom navigation based on current destination
-            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-                // Show appropriate bottom navigation items based on destination
-                bottomNav.getMenu().clear();
+            // Set up navigation listener once
+            bottomNav.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+                int currentDestId = navController.getCurrentDestination().getId();
                 
-                if (destination.getId() == R.id.homeFragment) {
-                    getMenuInflater().inflate(R.menu.bottom_nav_menu, bottomNav.getMenu());
-                } else {
-                    getMenuInflater().inflate(R.menu.bottom_nav_fragments, bottomNav.getMenu());
+                if (id == R.id.homeFragment && currentDestId != R.id.homeFragment) {
+                    navController.navigate(R.id.homeFragment, null, navOptions);
+                } else if (id == R.id.settingsFragment && currentDestId != R.id.settingsFragment) {
+                    navController.navigate(R.id.settingsFragment, null, navOptions);
                 }
                 
-                // Set up manual item selection with no animations
-                bottomNav.setOnItemSelectedListener(item -> {
-                    int id = item.getItemId();
-                    
-                    if (id == R.id.homeFragment && destination.getId() != R.id.homeFragment) {
-                        // Navigate to home with no animations
-                        navController.navigate(R.id.homeFragment, null, navOptions);
-                        return true;
-                    } else if (id == R.id.settingsFragment && destination.getId() != R.id.settingsFragment) {
-                        // Navigate to settings with no animations
-                        navController.navigate(R.id.settingsFragment, null, navOptions);
-                        return true;
-                    }
-                    
-                    return true;
-                });
-                
-                // Update selected item without triggering listener
+                return true;
+            });
+            
+            // Update selected item when destination changes
+            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+                // Temporarily disable the listener to avoid triggering navigation
                 bottomNav.setOnItemSelectedListener(null);
+                
+                // Update the selection
                 if (destination.getId() == R.id.homeFragment) {
                     bottomNav.setSelectedItemId(R.id.homeFragment);
                 } else if (destination.getId() == R.id.settingsFragment) {
                     bottomNav.setSelectedItemId(R.id.settingsFragment);
                 }
                 
-                // Re-add the listener after selection is set
+                // Re-add the listener
                 bottomNav.setOnItemSelectedListener(item -> {
                     int id = item.getItemId();
+                    int currentDestId = navController.getCurrentDestination().getId();
                     
-                    if (id == R.id.homeFragment && destination.getId() != R.id.homeFragment) {
-                        // Navigate to home with no animations
+                    if (id == R.id.homeFragment && currentDestId != R.id.homeFragment) {
                         navController.navigate(R.id.homeFragment, null, navOptions);
-                        return true;
-                    } else if (id == R.id.settingsFragment && destination.getId() != R.id.settingsFragment) {
-                        // Navigate to settings with no animations
+                    } else if (id == R.id.settingsFragment && currentDestId != R.id.settingsFragment) {
                         navController.navigate(R.id.settingsFragment, null, navOptions);
-                        return true;
                     }
                     
                     return true;
