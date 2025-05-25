@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -52,6 +53,15 @@ public class MainActivity extends AppCompatActivity {
             // Connect the BottomNavigationView with custom navigation
             bottomNav = findViewById(R.id.bottom_navigation);
             
+            // Create navigation options with no animations
+            NavOptions navOptions = new NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setEnterAnim(0)
+                .setExitAnim(0)
+                .setPopEnterAnim(0)
+                .setPopExitAnim(0)
+                .build();
+            
             // Update bottom navigation based on current destination
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
                 // Show appropriate bottom navigation items based on destination
@@ -63,29 +73,47 @@ public class MainActivity extends AppCompatActivity {
                     getMenuInflater().inflate(R.menu.bottom_nav_fragments, bottomNav.getMenu());
                 }
                 
-                // Set up manual item selection to avoid animations
+                // Set up manual item selection with no animations
                 bottomNav.setOnItemSelectedListener(item -> {
                     int id = item.getItemId();
                     
                     if (id == R.id.homeFragment && destination.getId() != R.id.homeFragment) {
-                        // Explicitly navigate to home
-                        navController.navigate(R.id.homeFragment);
+                        // Navigate to home with no animations
+                        navController.navigate(R.id.homeFragment, null, navOptions);
                         return true;
                     } else if (id == R.id.settingsFragment && destination.getId() != R.id.settingsFragment) {
-                        // Explicitly navigate to settings
-                        navController.navigate(R.id.settingsFragment);
+                        // Navigate to settings with no animations
+                        navController.navigate(R.id.settingsFragment, null, navOptions);
                         return true;
                     }
                     
                     return true;
                 });
                 
-                // Update selected item
+                // Update selected item without triggering listener
+                bottomNav.setOnItemSelectedListener(null);
                 if (destination.getId() == R.id.homeFragment) {
                     bottomNav.setSelectedItemId(R.id.homeFragment);
                 } else if (destination.getId() == R.id.settingsFragment) {
                     bottomNav.setSelectedItemId(R.id.settingsFragment);
                 }
+                
+                // Re-add the listener after selection is set
+                bottomNav.setOnItemSelectedListener(item -> {
+                    int id = item.getItemId();
+                    
+                    if (id == R.id.homeFragment && destination.getId() != R.id.homeFragment) {
+                        // Navigate to home with no animations
+                        navController.navigate(R.id.homeFragment, null, navOptions);
+                        return true;
+                    } else if (id == R.id.settingsFragment && destination.getId() != R.id.settingsFragment) {
+                        // Navigate to settings with no animations
+                        navController.navigate(R.id.settingsFragment, null, navOptions);
+                        return true;
+                    }
+                    
+                    return true;
+                });
             });
         }
         
