@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +28,8 @@ public class HomeFragment extends Fragment {
     private MaterialCardView garageButton;
     private MaterialCardView sprinklersButton;
     private MaterialCardView addDeviceButton;
+    private MaterialCardView turnOffAllButton;
+    private NexadomusApiClient apiClient;
 
     @Nullable
     @Override
@@ -38,6 +41,12 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
+        // Initialize API client
+        apiClient = NexadomusApiClient.getInstance();
+        if (getContext() != null) {
+            apiClient.setAppContext(getContext());
+        }
+        
         // Initialize views
         statusText = view.findViewById(R.id.statusText);
         lightsButton = view.findViewById(R.id.lightsButton);
@@ -45,6 +54,7 @@ public class HomeFragment extends Fragment {
         garageButton = view.findViewById(R.id.garageButton);
         sprinklersButton = view.findViewById(R.id.sprinklersButton);
         addDeviceButton = view.findViewById(R.id.addDeviceButton);
+        turnOffAllButton = view.findViewById(R.id.turnOffAllButton);
         
         // Set up button click listeners
         lightsButton.setOnClickListener(v -> 
@@ -61,9 +71,33 @@ public class HomeFragment extends Fragment {
         
         addDeviceButton.setOnClickListener(v -> 
             Navigation.findNavController(v).navigate(R.id.addDeviceFragment));
+            
+        // Set up Turn Off All button click listener
+        turnOffAllButton.setOnClickListener(v -> turnOffAllDevices());
         
         // Check and update WiFi connection status
         checkAndUpdateWiFiStatus();
+    }
+    
+    // Method to turn off all devices
+    private void turnOffAllDevices() {
+        // Show progress feedback to user
+        Toast.makeText(getContext(), "Turning off all devices...", Toast.LENGTH_SHORT).show();
+        
+        // Use the API client's method to turn off all devices at once
+        apiClient.turnOffAllDevices(new NexadomusApiClient.ApiCallback() {
+            @Override
+            public void onSuccess(String response) {
+                Log.d(TAG, "All devices turned off: " + response);
+                Toast.makeText(getContext(), "All devices turned off successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "Error turning off all devices: " + error);
+                Toast.makeText(getContext(), "Failed to turn off devices. Please try again.", Toast.LENGTH_LONG).show();
+            }
+        });
     }
     
     @Override

@@ -370,4 +370,29 @@ public class NexadomusApiClient {
             }
         });
     }
+
+    // Turn off all devices at once
+    public void turnOffAllDevices(ApiCallback callback) {
+        if (isConnectedToNexadomus()) {
+            // Use direct control via local network
+            String endpoint = BASE_URL + "/turn_off_all";
+            executeRequest(endpoint, callback);
+        } else if (hasInternetAccess()) {
+            // Use ThingSpeak for remote control
+            thingSpeakClient.sendCustomCommand("turn_off_all", new ThingSpeakClient.ThingSpeakCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    callback.onSuccess("Remote command sent: turn_off_all");
+                }
+
+                @Override
+                public void onError(String error) {
+                    callback.onError("Remote command failed: " + error);
+                }
+            });
+        } else {
+            // No connectivity at all
+            mainHandler.post(() -> callback.onError("No connectivity. Connect to Nexadomus AP or ensure internet access."));
+        }
+    }
 } 
