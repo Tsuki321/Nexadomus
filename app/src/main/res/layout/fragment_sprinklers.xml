@@ -125,15 +125,6 @@
                 android:gravity="center"
                 android:maxLines="3"
                 android:ellipsize="end"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Control your sprinklers remotely or set a watering schedule."
-                android:textAlignment="center"
-                android:layout_marginHorizontal="32dp"
-                android:textSize="14sp"
-                android:textStyle="italic"/>
         </LinearLayout>
     </ScrollView>
 

@@ -103,15 +103,6 @@
                     android:text="CLOSE"
                     style="@style/Widget.MaterialComponents.Button"/>
             </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Control your garage door remotely."
-                android:textAlignment="center"
-                android:layout_marginHorizontal="32dp"
-                android:textSize="14sp"
-                android:textStyle="italic"/>
         </LinearLayout>
     </ScrollView>
 
