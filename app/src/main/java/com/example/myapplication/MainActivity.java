@@ -6,7 +6,6 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -50,22 +49,43 @@ public class MainActivity extends AppCompatActivity {
                     .build();
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
             
-            // Connect the BottomNavigationView with navigation
+            // Connect the BottomNavigationView with custom navigation
             bottomNav = findViewById(R.id.bottom_navigation);
             
-            // Update bottom navigation visibility based on current destination
+            // Update bottom navigation based on current destination
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
                 // Show appropriate bottom navigation items based on destination
+                bottomNav.getMenu().clear();
+                
                 if (destination.getId() == R.id.homeFragment) {
-                    bottomNav.getMenu().clear();
                     getMenuInflater().inflate(R.menu.bottom_nav_menu, bottomNav.getMenu());
                 } else {
-                    bottomNav.getMenu().clear();
                     getMenuInflater().inflate(R.menu.bottom_nav_fragments, bottomNav.getMenu());
                 }
                 
-                // Set up navigation with the controller
-                NavigationUI.setupWithNavController(bottomNav, navController);
+                // Set up manual item selection to avoid animations
+                bottomNav.setOnItemSelectedListener(item -> {
+                    int id = item.getItemId();
+                    
+                    if (id == R.id.homeFragment && destination.getId() != R.id.homeFragment) {
+                        // Explicitly navigate to home
+                        navController.navigate(R.id.homeFragment);
+                        return true;
+                    } else if (id == R.id.settingsFragment && destination.getId() != R.id.settingsFragment) {
+                        // Explicitly navigate to settings
+                        navController.navigate(R.id.settingsFragment);
+                        return true;
+                    }
+                    
+                    return true;
+                });
+                
+                // Update selected item
+                if (destination.getId() == R.id.homeFragment) {
+                    bottomNav.setSelectedItemId(R.id.homeFragment);
+                } else if (destination.getId() == R.id.settingsFragment) {
+                    bottomNav.setSelectedItemId(R.id.settingsFragment);
+                }
             });
         }
         
@@ -77,22 +97,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        
-        if (id == R.id.action_help) {
-            // Show help dialog using existing HelpDialogUtil
-            HelpDialogUtil.showHelpDialog(this, "Local Mode Connection", 
-                    "If for some reason you are unable to command the Devices through Remote mode, try switching to Local mode by connecting to the Hotspot of the ESP32.\n\n" +
-                    "SSID: Nexadomus Home\n" +
-                    "Password: smartHome1234");
-            return true;
-        }
-        
-        return super.onOptionsItemSelected(item);
     }
     
     @Override

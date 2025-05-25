@@ -41,24 +41,6 @@
                 android:text="About Nexadomus"
                 android:textAlignment="center" />
 
-            <Button
-                android:id="@+id/helpButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:padding="12dp"
-                android:text="Help"
-                android:textAlignment="center" />
-
-            <Button
-                android:id="@+id/wifiSettingsButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:padding="12dp"
-                android:text="WiFi Settings"
-                android:textAlignment="center" />
-
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
