@@ -5,6 +5,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String NEXADOMUS_SSID = "Nexadomus Home";
     private NavController navController;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,18 +46,80 @@ public class MainActivity extends AppCompatActivity {
             
             // Set up the AppBarConfiguration to connect NavController with Toolbar
             AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                    R.id.lightsFragment, R.id.acFragment, R.id.garageFragment, 
-                    R.id.sprinklersFragment, R.id.addDeviceFragment)
+                    R.id.homeFragment)
                     .build();
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
             
-            // Connect the BottomNavigationView with the NavController
-            BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-            NavigationUI.setupWithNavController(bottomNav, navController);
+            // Connect the BottomNavigationView with custom navigation
+            bottomNav = findViewById(R.id.bottom_navigation);
+            setupBottomNavigation();
+            
+            // Update bottom navigation visibility based on current destination
+            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+                // Show appropriate bottom navigation items based on destination
+                if (destination.getId() == R.id.homeFragment) {
+                    bottomNav.getMenu().clear();
+                    getMenuInflater().inflate(R.menu.bottom_nav_menu, bottomNav.getMenu());
+                } else {
+                    bottomNav.getMenu().clear();
+                    getMenuInflater().inflate(R.menu.bottom_nav_fragments, bottomNav.getMenu());
+                }
+                // Set up the bottom navigation again after menu changes
+                setupBottomNavigation();
+            });
         }
         
         // Check WiFi connection status
         checkWiFiConnection();
+    }
+    
+    private void setupBottomNavigation() {
+        if (bottomNav != null) {
+            bottomNav.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+                
+                if (id == R.id.homeFragment) {
+                    navController.navigate(R.id.homeFragment);
+                    return true;
+                } else if (id == R.id.action_settings) {
+                    showToast("Settings - Coming Soon");
+                    return true;
+                }
+                
+                return false;
+            });
+        }
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        
+        if (id == R.id.action_about) {
+            // Show about dialog
+            AboutDialogFragment aboutDialog = new AboutDialogFragment();
+            aboutDialog.show(getSupportFragmentManager(), "about_dialog");
+            return true;
+        } else if (id == R.id.action_help) {
+            // Show help dialog using existing HelpDialogUtil
+            HelpDialogUtil.showHelpDialog(this, "Need help with Nexadomus?", 
+                    "Nexadomus allows you to control your smart home devices remotely. " +
+                    "Navigate to each device control using the buttons on the Home screen.");
+            return true;
+        }
+        
+        return super.onOptionsItemSelected(item);
+    }
+    
+    @Override
+    public boolean onSupportNavigateUp() {
+        return navController.navigateUp() || super.onSupportNavigateUp();
     }
     
     @Override

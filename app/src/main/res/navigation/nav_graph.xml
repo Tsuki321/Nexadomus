@@ -3,7 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/lightsFragment">
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.myapplication.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_lightsFragment"
+            app:destination="@id/lightsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_acFragment"
+            app:destination="@id/acFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_garageFragment"
+            app:destination="@id/garageFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_sprinklersFragment"
+            app:destination="@id/sprinklersFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_addDeviceFragment"
+            app:destination="@id/addDeviceFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/lightsFragment"
@@ -32,6 +54,11 @@
     <fragment
         android:id="@+id/addDeviceFragment"
         android:name="com.example.myapplication.AddDeviceFragment"
-        android:label="Add Device" />
-
+        android:label="Add Device"
+        tools:layout="@layout/fragment_add_device" />
+        
+    <dialog
+        android:id="@+id/aboutDialogFragment"
+        android:name="com.example.myapplication.AboutDialogFragment"
+        android:label="About" />
 </navigation> 
