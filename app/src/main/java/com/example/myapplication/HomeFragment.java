@@ -26,7 +26,6 @@ public class HomeFragment extends Fragment {
     private MaterialCardView acButton;
     private MaterialCardView garageButton;
     private MaterialCardView sprinklersButton;
-    private MaterialCardView hubButton;
     private MaterialCardView addDeviceButton;
 
     @Nullable
@@ -45,7 +44,6 @@ public class HomeFragment extends Fragment {
         acButton = view.findViewById(R.id.acButton);
         garageButton = view.findViewById(R.id.garageButton);
         sprinklersButton = view.findViewById(R.id.sprinklersButton);
-        hubButton = view.findViewById(R.id.hubButton);
         addDeviceButton = view.findViewById(R.id.addDeviceButton);
         
         // Set up button click listeners
@@ -60,12 +58,6 @@ public class HomeFragment extends Fragment {
         
         sprinklersButton.setOnClickListener(v -> 
             Navigation.findNavController(v).navigate(R.id.action_homeFragment_to_sprinklersFragment));
-            
-        // Other buttons will be implemented when their features are added
-        hubButton.setOnClickListener(v -> {
-            // Future implementation will navigate to hub status screen
-            checkAndUpdateWiFiStatus();
-        });
         
         addDeviceButton.setOnClickListener(v -> 
             Navigation.findNavController(v).navigate(R.id.addDeviceFragment));

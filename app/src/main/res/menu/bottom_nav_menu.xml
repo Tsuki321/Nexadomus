@@ -6,7 +6,7 @@
         android:icon="@drawable/ic_hub"/>
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/settingsFragment"
         android:title="Settings"
         android:icon="@android:drawable/ic_menu_preferences"/>
 </menu> 

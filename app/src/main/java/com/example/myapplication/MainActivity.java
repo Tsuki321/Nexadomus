@@ -46,13 +46,12 @@ public class MainActivity extends AppCompatActivity {
             
             // Set up the AppBarConfiguration to connect NavController with Toolbar
             AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                    R.id.homeFragment)
+                    R.id.homeFragment, R.id.settingsFragment)
                     .build();
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
             
-            // Connect the BottomNavigationView with custom navigation
+            // Connect the BottomNavigationView with navigation
             bottomNav = findViewById(R.id.bottom_navigation);
-            setupBottomNavigation();
             
             // Update bottom navigation visibility based on current destination
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
@@ -64,31 +63,14 @@ public class MainActivity extends AppCompatActivity {
                     bottomNav.getMenu().clear();
                     getMenuInflater().inflate(R.menu.bottom_nav_fragments, bottomNav.getMenu());
                 }
-                // Set up the bottom navigation again after menu changes
-                setupBottomNavigation();
+                
+                // Set up navigation with the controller
+                NavigationUI.setupWithNavController(bottomNav, navController);
             });
         }
         
         // Check WiFi connection status
         checkWiFiConnection();
-    }
-    
-    private void setupBottomNavigation() {
-        if (bottomNav != null) {
-            bottomNav.setOnItemSelectedListener(item -> {
-                int id = item.getItemId();
-                
-                if (id == R.id.homeFragment) {
-                    navController.navigate(R.id.homeFragment);
-                    return true;
-                } else if (id == R.id.action_settings) {
-                    showToast("Settings - Coming Soon");
-                    return true;
-                }
-                
-                return false;
-            });
-        }
     }
     
     @Override
@@ -101,12 +83,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         
-        if (id == R.id.action_about) {
-            // Show about dialog
-            AboutDialogFragment aboutDialog = new AboutDialogFragment();
-            aboutDialog.show(getSupportFragmentManager(), "about_dialog");
-            return true;
-        } else if (id == R.id.action_help) {
+        if (id == R.id.action_help) {
             // Show help dialog using existing HelpDialogUtil
             HelpDialogUtil.showHelpDialog(this, "Need help with Nexadomus?", 
                     "Nexadomus allows you to control your smart home devices remotely. " +
