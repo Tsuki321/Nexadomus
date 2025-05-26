@@ -1,6 +1,6 @@
 # Nexadomus
 
-Smart home automation application for Android that connects to various IoT devices. This application is part of the Nexadomus smart home ecosystem.
+Smart home automation application for Android that connects to various IoT devices. This application is made by the Nexadomus Team or Group, Engineer gaming.
 
 ## Features
 
