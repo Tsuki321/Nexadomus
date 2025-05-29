@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".HomeFragment">
 
     <TextView
@@ -13,6 +14,7 @@
         android:layout_marginTop="24dp"
         android:text="Welcome to Nexadomus"
         android:textAlignment="center"
+        android:textColor="@color/on_background"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,6 +28,7 @@
         android:layout_marginTop="8dp"
         android:text="Connected to Nexadomus Home"
         android:textAlignment="center"
+        android:textColor="@color/on_background"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,6 +39,7 @@
         android:layout_height="0dp"
         android:layout_margin="16dp"
         app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="@color/surface"
         app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,6 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Smart Home Controls"
+                android:textColor="@color/on_surface"
                 android:textAlignment="center"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -85,6 +90,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="@color/primary"
                         app:cardElevation="2dp">
 
                         <LinearLayout
@@ -105,6 +111,7 @@
                                 android:layout_marginTop="8dp"
                                 android:text="Lights"
                                 android:textAlignment="center"
+                                android:textColor="@color/on_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -121,6 +128,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="@color/primary"
                         app:cardElevation="2dp">
 
                         <LinearLayout
@@ -141,6 +149,7 @@
                                 android:layout_marginTop="8dp"
                                 android:text="A/C"
                                 android:textAlignment="center"
+                                android:textColor="@color/on_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -157,6 +166,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="@color/primary"
                         app:cardElevation="2dp">
 
                         <LinearLayout
@@ -177,6 +187,7 @@
                                 android:layout_marginTop="8dp"
                                 android:text="Garage Door"
                                 android:textAlignment="center"
+                                android:textColor="@color/on_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -193,6 +204,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="@color/primary"
                         app:cardElevation="2dp">
 
                         <LinearLayout
@@ -213,6 +225,7 @@
                                 android:layout_marginTop="8dp"
                                 android:text="Sprinklers"
                                 android:textAlignment="center"
+                                android:textColor="@color/on_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -229,6 +242,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="@color/primary"
                         app:cardElevation="2dp">
 
                         <LinearLayout
@@ -249,6 +263,7 @@
                                 android:layout_marginTop="8dp"
                                 android:text="Turn Off All"
                                 android:textAlignment="center"
+                                android:textColor="@color/on_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -265,6 +280,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="@color/primary"
                         app:cardElevation="2dp">
 
                         <LinearLayout
@@ -285,6 +301,7 @@
                                 android:layout_marginTop="8dp"
                                 android:text="Add Device"
                                 android:textAlignment="center"
+                                android:textColor="@color/on_primary"
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
                         </LinearLayout>

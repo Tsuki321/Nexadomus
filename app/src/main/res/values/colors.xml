@@ -3,4 +3,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="app_logo_background">#2b2a2a</color>
+    
+    <!-- Theme Colors -->
+    <color name="primary">#4FC3F7</color> <!-- Light blue instead of pink/violet -->
+    <color name="primary_variant">#03A9F4</color> <!-- Darker blue for contrast -->
+    <color name="secondary">#B0BEC5</color> <!-- Light grey -->
+    <color name="background">#212121</color> <!-- Dark grey background -->
+    <color name="surface">#303030</color> <!-- Slightly lighter grey for cards -->
+    <color name="on_primary">#000000</color> <!-- Black text on light blue -->
+    <color name="on_background">#FFFFFF</color> <!-- White text on dark background -->
+    <color name="on_surface">#FFFFFF</color> <!-- White text on surface -->
+    <color name="icon_color">#FFFFFF</color> <!-- White color for icons -->
 </resources>
