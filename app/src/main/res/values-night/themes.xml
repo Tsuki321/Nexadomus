@@ -12,5 +12,8 @@
         <item name="colorOnSurface">@color/on_surface</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:statusBarColor">@color/background</item>
+        
+        <!-- Bottom navigation styling -->
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
     </style>
 </resources>

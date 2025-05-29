@@ -12,6 +12,9 @@
         <item name="colorOnSurface">@color/on_surface</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:statusBarColor">@color/background</item>
+        
+        <!-- Bottom navigation styling -->
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />
@@ -36,5 +39,17 @@
         <item name="colorOnSurface">@color/on_surface</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:statusBarColor">@color/background</item>
+    </style>
+    
+    <!-- Custom bottom navigation style -->
+    <style name="Widget.App.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
+    </style>
+
+    <style name="ThemeOverlay.App.BottomNavigationView" parent="">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSurface">@color/primary</item>
+        <item name="colorOnSurface">@color/on_primary</item>
     </style>
 </resources>
